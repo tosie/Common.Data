@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Controller\ListExtensions.cs" />
     <Compile Include="Interfaces\IDbRecord.cs" />
     <Compile Include="Interfaces\IEditableDbRecord.cs" />
     <Compile Include="Model\DbRecord.cs" />
