@@ -84,6 +84,9 @@ namespace Common.Data {
 
                 // Execute the VACUUM statement
                 new CodingHorror(provider, "VACUUM;").Execute();
+
+                // Reset the flag
+                NeedsVacuum[repository] = false;
             }
         }
 
