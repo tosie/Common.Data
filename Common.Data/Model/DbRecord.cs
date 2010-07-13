@@ -314,6 +314,10 @@ namespace Common.Data {
             // Delete from database
             OwningRepository.Delete<T>((this as T).Id);
 
+            // Remember that something has been deleted from this repository
+            // (so that vacuum is not done on all repositories)
+            SharedObjects.Instance.NeedsVacuum[OwningRepository] = true;
+
             Deleted = true;
             return true;
         }

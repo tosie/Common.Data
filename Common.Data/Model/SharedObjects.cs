@@ -7,6 +7,8 @@ using System.Configuration;
 using System.Windows.Forms;
 using SubSonic.DataProviders;
 using System.IO;
+using SubSonic.Query;
+using System.Diagnostics;
 
 namespace Common.Data {
     public class SharedObjects {
@@ -16,6 +18,8 @@ namespace Common.Data {
         public SimpleRepository Repository { get; set; }
 
         public Dictionary<String, Object> Cache { get; protected set; }
+
+        public Dictionary<SimpleRepository, Boolean> NeedsVacuum { get; set; }
 
         #endregion
 
@@ -30,7 +34,11 @@ namespace Common.Data {
         /// <returns></returns>
         public SimpleRepository OpenRepository(String ConnectionString, String ProviderName) {
             IDataProvider provider = ProviderFactory.GetProvider(ConnectionString, ProviderName);
-            return new SimpleRepository(provider, SimpleRepositoryOptions.RunMigrations);
+            SimpleRepository result = new SimpleRepository(provider, SimpleRepositoryOptions.RunMigrations);
+
+            NeedsVacuum[result] = false;
+
+            return result;
         }
 
         /// <summary>
@@ -60,6 +68,25 @@ namespace Common.Data {
             Repository = OpenRepository(ConnectionString);
         }
 
+        public void VacuumRepositories() {
+            foreach (var kv in NeedsVacuum) {
+                SimpleRepository repository = kv.Key;
+                Boolean needs_vacuum = kv.Value;
+
+                if (!needs_vacuum)
+                    continue;
+
+                IDataProvider provider = DbRecord.GetDataProvider(repository);
+
+                // Do the vacuum on SQLite databases, only
+                if (String.Compare(provider.Name, "System.Data.SQLite", true) != 0)
+                    continue;
+
+                // Execute the VACUUM statement
+                new CodingHorror(provider, "VACUUM;").Execute();
+            }
+        }
+
         #endregion
 
         #region Singleton Pattern
@@ -68,6 +95,7 @@ namespace Common.Data {
 
         public SharedObjects() {
             Cache = new Dictionary<String, Object>();
+            NeedsVacuum = new Dictionary<SimpleRepository, Boolean>();
         }
 
         public static SharedObjects Instance {
@@ -86,5 +114,6 @@ namespace Common.Data {
         }
 
         #endregion
+
     }
 }
