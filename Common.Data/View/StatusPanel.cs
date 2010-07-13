@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-namespace Common.Data.View {
+namespace Common.Data {
     public partial class StatusPanel : UserControl {
 
         #region Properties

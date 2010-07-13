@@ -1,4 +1,4 @@
-﻿namespace Common.Data.View {
+﻿namespace Common.Data {
     partial class StatusPanel {
         /// <summary> 
         /// Required designer variable.
