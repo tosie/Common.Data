@@ -34,12 +34,13 @@
             // 
             this.lblProgress.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Right)));
+            this.lblProgress.AutoEllipsis = true;
             this.lblProgress.BackColor = System.Drawing.Color.Transparent;
             this.lblProgress.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.lblProgress.ForeColor = System.Drawing.SystemColors.GrayText;
             this.lblProgress.Location = new System.Drawing.Point(126, 9);
             this.lblProgress.Name = "lblProgress";
-            this.lblProgress.Size = new System.Drawing.Size(314, 246);
+            this.lblProgress.Size = new System.Drawing.Size(328, 152);
             this.lblProgress.TabIndex = 5;
             this.lblProgress.Text = "Status";
             this.lblProgress.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -52,20 +53,22 @@
             this.WaitingPicture.InitialImage = null;
             this.WaitingPicture.Location = new System.Drawing.Point(98, 9);
             this.WaitingPicture.Name = "WaitingPicture";
-            this.WaitingPicture.Size = new System.Drawing.Size(30, 248);
+            this.WaitingPicture.Size = new System.Drawing.Size(30, 154);
             this.WaitingPicture.SizeMode = System.Windows.Forms.PictureBoxSizeMode.CenterImage;
             this.WaitingPicture.TabIndex = 4;
             this.WaitingPicture.TabStop = false;
             // 
             // btnCancel
             // 
+            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnCancel.BackColor = System.Drawing.SystemColors.Control;
-            this.btnCancel.Location = new System.Drawing.Point(379, 241);
+            this.btnCancel.Location = new System.Drawing.Point(379, 147);
             this.btnCancel.Name = "btnCancel";
             this.btnCancel.Size = new System.Drawing.Size(75, 23);
             this.btnCancel.TabIndex = 6;
             this.btnCancel.Text = "Abbrechen";
             this.btnCancel.UseVisualStyleBackColor = false;
+            this.btnCancel.Visible = false;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
             // 
             // StatusPanel
@@ -78,7 +81,7 @@
             this.Controls.Add(this.lblProgress);
             this.Controls.Add(this.WaitingPicture);
             this.Name = "StatusPanel";
-            this.Size = new System.Drawing.Size(457, 267);
+            this.Size = new System.Drawing.Size(457, 173);
             ((System.ComponentModel.ISupportInitialize)(this.WaitingPicture)).EndInit();
             this.ResumeLayout(false);
 

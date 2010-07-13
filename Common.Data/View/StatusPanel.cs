@@ -51,13 +51,7 @@ namespace Common.Data.View {
         #region Constructor
 
         public StatusPanel() {
-            InitializeDefaultValues();
             InitializeComponent();
-        }
-
-        protected void InitializeDefaultValues() {
-            lblProgress.Text = "Status";
-            btnCancel.Hide();
         }
 
         #endregion
