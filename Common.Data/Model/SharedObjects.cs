@@ -84,9 +84,12 @@ namespace Common.Data {
 
                 // Execute the VACUUM statement
                 new CodingHorror(provider, "VACUUM;").Execute();
+            }
 
-                // Reset the flag
-                NeedsVacuum[repository] = false;
+            // Reset the flag
+            SimpleRepository[] keys = NeedsVacuum.Keys.ToArray();
+            for (int i = 0; i < keys.Length; i++) {
+                NeedsVacuum[keys[i]] = false;
             }
         }
 
