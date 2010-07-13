@@ -87,6 +87,12 @@
     <Compile Include="View\DbRecordEditForm.Designer.cs">
       <DependentUpon>DbRecordEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\StatusPanel.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="View\StatusPanel.Designer.cs">
+      <DependentUpon>StatusPanel.cs</DependentUpon>
+    </Compile>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -95,6 +101,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\DbRecordEditForm.resx">
       <DependentUpon>DbRecordEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\StatusPanel.resx">
+      <DependentUpon>StatusPanel.cs</DependentUpon>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
