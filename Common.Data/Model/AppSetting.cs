@@ -19,6 +19,8 @@ namespace Common.Data {
 
         public Int32 IntValue { get; set; }
 
+        public Int64 LongValue { get; set; }
+
         [SubSonicNullString]
         public String StringValue { get; set; }
 
@@ -43,6 +45,25 @@ namespace Common.Data {
                 setting = AppSetting.Create(value);
             } else {
                 setting.IntValue = value;
+                setting.Update();
+            }
+        }
+
+        public static Int64 Long(String key, Int64 default_value) {
+            AppSetting setting = AppSetting.Read(key);
+            if (setting == null) {
+                return default_value;
+            } else {
+                return setting.LongValue;
+            }
+        }
+
+        public static void SetLong(String key, Int64 value) {
+            AppSetting setting = AppSetting.Read(key);
+            if (setting == null) {
+                setting = AppSetting.Create(value);
+            } else {
+                setting.LongValue = value;
                 setting.Update();
             }
         }
@@ -148,6 +169,8 @@ namespace Common.Data {
 
             if (Tag is Int32)
                 IntValue = (Int32)Tag;
+            else if (Tag is Int64)
+                LongValue = (Int64)Tag;
             else if (Tag is String)
                 StringValue = (String)Tag;
             else if (Tag is Boolean)
