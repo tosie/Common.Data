@@ -42,7 +42,7 @@ namespace Common.Data {
         public static void SetInt(String key, Int32 value) {
             AppSetting setting = AppSetting.Read(key);
             if (setting == null) {
-                setting = AppSetting.Create(value);
+                setting = AppSetting.Create(new object[] { key, value });
             } else {
                 setting.IntValue = value;
                 setting.Update();
@@ -61,7 +61,7 @@ namespace Common.Data {
         public static void SetLong(String key, Int64 value) {
             AppSetting setting = AppSetting.Read(key);
             if (setting == null) {
-                setting = AppSetting.Create(value);
+                setting = AppSetting.Create(new object[] { key, value });
             } else {
                 setting.LongValue = value;
                 setting.Update();
@@ -80,7 +80,7 @@ namespace Common.Data {
         public static void SetString(String key, String value) {
             AppSetting setting = AppSetting.Read(key);
             if (setting == null) {
-                setting = AppSetting.Create(value);
+                setting = AppSetting.Create(new object[] { key, value });
             } else {
                 setting.StringValue = value;
                 setting.Update();
@@ -99,7 +99,7 @@ namespace Common.Data {
         public static void SetBool(String key, Boolean value) {
             AppSetting setting = AppSetting.Read(key);
             if (setting == null) {
-                setting = AppSetting.Create(value);
+                setting = AppSetting.Create(new object[] { key, value });
             } else {
                 setting.BoolValue = value;
                 setting.Update();
@@ -164,8 +164,14 @@ namespace Common.Data {
         #region IDbRecord Members
 
         public void InitializeWithDefaults(Object Tag) {
-            // Setup a temporary name
-            Name = Guid.NewGuid().ToString();
+            if (Tag is object[]) {
+                object[] options = (object[])Tag;
+                Name = (String)options[0];
+                Tag = options[1];
+            } else {
+                // Setup a temporary name if none was given
+                Name = Guid.NewGuid().ToString();
+            }
 
             if (Tag == null)
                 return;
