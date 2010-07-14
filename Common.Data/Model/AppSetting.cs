@@ -164,6 +164,9 @@ namespace Common.Data {
         #region IDbRecord Members
 
         public void InitializeWithDefaults(Object Tag) {
+            // Setup a temporary name
+            Name = Guid.NewGuid().ToString();
+
             if (Tag == null)
                 return;
 
