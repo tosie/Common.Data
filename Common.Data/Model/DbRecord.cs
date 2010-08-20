@@ -184,13 +184,13 @@ namespace Common.Data {
                 return null;
             }
 
+            // Add the instance to the cache
+            Cache.Add(instance);
+
             // Let the object load itself
             instance.Deleted = false;
             instance.OwningRepository = repository;
             instance.AfterLoad();
-
-            // Add the instance to the cache
-            Cache.Add(instance);
 
             // Return the object
             return instance;
@@ -220,13 +220,19 @@ namespace Common.Data {
             // in the cache and ensure object consistency
             // (only do this once!)
             List<T> Cache = GetCache<T>(repository);
-            if (!SharedObjects.Instance.Cache.ContainsKey(GetCacheKey<T>(repository) + "_LOADED")) {
+            String loaded_key = GetCacheKey<T>(repository) + "_LOADED";
+            if (!SharedObjects.Instance.Cache.ContainsKey(loaded_key)) {
                 List<Int64> ids = new List<Int64>(Cache.Count);
                 Cache.ForEach(i => ids.Add(i.Id));
                 List<T> instances = repository.All<T>().ToList();
 
                 // This cannot be done inside the query, as +ids+ is not locally available there
                 instances = instances.Where(i => !ids.Contains(i.Id)).ToList();
+
+                // Add the new objects to the cache before running their
+                // +AfterLoad+ method, as that might read again from the
+                // database.
+                Cache.AddRange(instances);
 
                 // Let the objects load themselves
                 instances.ForEach(instance => {
@@ -235,16 +241,17 @@ namespace Common.Data {
                     instance.AfterLoad();
                 });
 
-                // Add the new objects to the cache
-                Cache.AddRange(instances);
-
                 // Make sure that this gets executed only once
-                SharedObjects.Instance.Cache[GetCacheKey<T>(repository) + "_LOADED"] = true;
+                SharedObjects.Instance.Cache[loaded_key] = true;
             }
 
             // Return _all_ elements, not only the ones just read from
-            // the database
-            return Cache;
+            // the database. Also make sure that not an instance to the
+            // cache is returned, but a new list. Otherwise changes to
+            // the returned list are made to the cache as well.
+            List<T> result = new List<T>(Cache.Count);
+            result.AddRange(Cache);
+            return result;
         }
 
         /// <summary>
