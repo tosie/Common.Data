@@ -58,6 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DummyModel.cs" />
+    <Compile Include="DummyModelHasMany.cs" />
+    <Compile Include="HasManyEditFormTest.cs" />
     <Compile Include="HasManyTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

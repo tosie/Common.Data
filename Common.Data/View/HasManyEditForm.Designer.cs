@@ -1,4 +1,4 @@
-﻿namespace Common.Data.View {
+﻿namespace Common.Data {
     partial class HasManyEditForm {
         /// <summary>
         /// Required designer variable.
