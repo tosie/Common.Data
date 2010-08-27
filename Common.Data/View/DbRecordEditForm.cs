@@ -42,6 +42,7 @@ namespace Common.Data {
 
         #region Events
 
+        // TODO: So umschreiben, dass man ohne Event auskommt (Reflection nutzen)!
         public delegate IEditableDbRecord CreateNewRecordHandler(String SuggestedName);
         public event CreateNewRecordHandler CreateNewRecord;
         protected IEditableDbRecord RaiseCreateNewRecord(String SuggestedName) {
@@ -85,7 +86,7 @@ namespace Common.Data {
 
         #endregion
 
-        #region GUI
+        #region GUI Support
 
         void SelectRecord(IEditableDbRecord Record, Boolean EnsureVisibility, Boolean EditAfterSelect) {
             if (List.Items.Count <= 0)
@@ -179,12 +180,20 @@ namespace Common.Data {
 
         void entry_PropertyChanged(object sender, PropertyChangedEventArgs e) {
             if (e.PropertyName == "Value") {
+                
+                // TODO: Do not save here, bust just mark the record as dirty. Then save whenever
+                //       another record is selected, the window is closed, etc.
+                
                 // Save any changes to the record
                 SelectedRecord.Update();
             }
         }
 
         #endregion
+
+        #region GUI Event Handlers
+
+        // TODO: Make it possible to close the window by pressing ESC
 
         private void btnAddRecord_Click(object sender, EventArgs e) {
             // Create a new instance
@@ -283,6 +292,8 @@ namespace Common.Data {
         private void DbRecordEditFormForm_FormClosing(object sender, FormClosingEventArgs e) {
             FormData.SaveFormData(this);
         }
+
+        #endregion
 
     }
 }

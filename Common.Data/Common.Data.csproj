@@ -73,6 +73,7 @@
     <Compile Include="Model\AppSetting.cs" />
     <Compile Include="Model\DbRecord.cs" />
     <Compile Include="Model\FormData.cs" />
+    <Compile Include="Model\HasMany.cs" />
     <Compile Include="Model\SharedObjects.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -88,6 +89,12 @@
     <Compile Include="View\DbRecordEditForm.Designer.cs">
       <DependentUpon>DbRecordEditForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="View\HasManyEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\HasManyEditForm.Designer.cs">
+      <DependentUpon>HasManyEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\StatusPanel.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -102,6 +109,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="View\DbRecordEditForm.resx">
       <DependentUpon>DbRecordEditForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\HasManyEditForm.resx">
+      <DependentUpon>HasManyEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\StatusPanel.resx">
       <DependentUpon>StatusPanel.cs</DependentUpon>

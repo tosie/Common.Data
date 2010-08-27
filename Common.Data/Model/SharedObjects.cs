@@ -64,6 +64,10 @@ namespace Common.Data {
             return OpenRepository(connection_string, provider_name);
         }
 
+        public void SetupRepository(String ConnectionString, String ProviderName) {
+            Repository = OpenRepository(ConnectionString, ProviderName);
+        }
+
         public void SetupRepository(String ConnectionString) {
             Repository = OpenRepository(ConnectionString);
         }
