@@ -77,7 +77,6 @@ namespace Common.Data.Test
             var set1 = DummyModelHasMany.Create(new object[] { "set1", 31 });
             DummySetData.Add(set1);
             set1.Set.Add(DummyData[0]);
-            set1.Set.Add(DummyData[1]);
             set1.Set.Add(DummyData[2]);
             set1.Update();
         }
@@ -97,14 +96,25 @@ namespace Common.Data.Test
 
             target.OwningRecord = input_record;
             target.PropertyName = input_property;
+
+            Assert.AreEqual(DummyData.Count, target.AllRecords.Count, "AllRecords count");
+            Assert.AreEqual(DummySetData[0].Set.Count, target.SelectedRecords.Count, "SelectedRecords count");
+            Assert.AreEqual(DummyData.Count - DummySetData[0].Set.Count, target.UnselectedRecords.Count, "UnselectedRecords count");
+
+            Assert.AreEqual(DummyData[0].Id, target.SelectedRecords[0].Id, "First selected record");
+            Assert.AreEqual(DummyData[1].Id, target.UnselectedRecords[0].Id, "First unselected record");
         }
 
         /// <summary>
-        ///A test for SelectRecords
+        /// Shows the HasManyEditForm (thus, this test is ignored and must be called manually).
         ///</summary>
         [TestMethod()]
+        [Ignore]
         public void SelectRecordsTest() {
-            // TODO
+            var input_record = DummySetData[0];
+            var input_property = "Set";
+
+            HasManyEditForm.SelectRecords(null, input_record, input_property);
         }
     }
 }

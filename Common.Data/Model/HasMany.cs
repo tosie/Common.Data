@@ -5,9 +5,10 @@ using System.Text;
 using System.IO;
 using System.IO.Compression;
 using System.Reflection;
+using System.Collections;
 
 namespace Common.Data {
-    public class HasMany<T> : IList<T> where T : DbRecord, IDbRecord, new() {
+    public class HasMany<T> : IList<T>, IList where T : DbRecord, IDbRecord, new() {
 
         #region Properties / Class Variables
 
@@ -114,6 +115,26 @@ namespace Common.Data {
 
         #endregion
 
+        #region Sorting Methods
+
+        public void Sort() {
+            Data.Sort();
+        }
+
+        public void Sort(Comparison<T> comparison) {
+            Data.Sort(comparison);
+        }
+
+        public void Sort(IComparer<T> comparer) {
+            Data.Sort(comparer);
+        }
+
+        public void Sort(int index, int count, IComparer<T> comparer) {
+            Data.Sort(index, count, comparer);
+        }
+
+        #endregion
+
         #region IList<T> Members
 
         public int IndexOf(T item) {
@@ -187,25 +208,58 @@ namespace Common.Data {
 
         #endregion
 
-        #region Sorting Methods
+        #region IList Members
 
-        public void Sort() {
-            Data.Sort();
+        public int Add(object value) {
+            Add((T)value);
+            return Count - 1;
         }
 
-        public void Sort(Comparison<T> comparison) {
-            Data.Sort(comparison);
+        public bool Contains(object value) {
+            return Contains((T)value);
         }
 
-        public void Sort(IComparer<T> comparer) {
-            Data.Sort(comparer);
+        public int IndexOf(object value) {
+            return IndexOf((T)value);
         }
 
-        public void Sort(int index, int count, IComparer<T> comparer) {
-            Data.Sort(index, count, comparer);
+        public void Insert(int index, object value) {
+            Insert(index, (T)value);
+        }
+
+        public bool IsFixedSize {
+            get { return false; }
+        }
+
+        public void Remove(object value) {
+            Remove((T)value);
+        }
+
+        object IList.this[int index] {
+            get {
+                return Data[index];
+            }
+            set {
+                this[index] = (T)value;
+            }
         }
 
         #endregion
 
+        #region ICollection Members
+
+        public void CopyTo(Array array, int index) {
+            throw new NotImplementedException();
+        }
+
+        public bool IsSynchronized {
+            get { throw new NotImplementedException(); }
+        }
+
+        public object SyncRoot {
+            get { throw new NotImplementedException(); }
+        }
+
+        #endregion
     }
 }
