@@ -68,7 +68,13 @@ namespace Common.Data.Test
 
             DummyData.Add(DummyModel.Create(new object[] { "key1", 21 }));
             DummyData.Add(DummyModel.Create(new object[] { "key2", 22 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key3", 23 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key4", 23 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key5", 24 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key6", 25 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key7", 26 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key8", 27 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key9", 28 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key10", 29 }));
 
             DummyData.ForEach(d => d.Update());
 
@@ -77,6 +83,9 @@ namespace Common.Data.Test
             var set1 = DummyModelHasMany.Create(new object[] { "set1", 31 });
             DummySetData.Add(set1);
             set1.Set.Add(DummyData[0]);
+            set1.Set.Add(DummyData[3]);
+            set1.Set.Add(DummyData[5]);
+            set1.Set.Add(DummyData[6]);
             set1.Set.Add(DummyData[2]);
             set1.Update();
         }
@@ -109,7 +118,7 @@ namespace Common.Data.Test
         /// Shows the HasManyEditForm (thus, this test is ignored and must be called manually).
         ///</summary>
         [TestMethod()]
-        [Ignore]
+        //[Ignore]
         public void SelectRecordsTest() {
             var input_record = DummySetData[0];
             var input_property = "Set";

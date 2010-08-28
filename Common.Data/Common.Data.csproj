@@ -81,6 +81,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="ViewHelpers\FasterListView.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="ViewHelpers\Messages.cs" />
     <Compile Include="ViewHelpers\NoBorderToolStripRenderer.cs" />
     <Compile Include="View\DbRecordEditForm.cs">

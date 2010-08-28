@@ -6,7 +6,7 @@ using SubSonic.SqlGeneration.Schema;
 using SubSonic.Repository;
 
 namespace Common.Data.Test {
-    class DummyModel : DbRecord, IDbRecord {
+    class DummyModel : DbRecord, IEditableDbRecord {
 
         #region Properties
 
@@ -40,7 +40,16 @@ namespace Common.Data.Test {
 
         #endregion
 
-        #region IDbRecord Members
+        #region IEditableDbRecord Members
+
+        public IEditableDbRecord Duplicate() {
+            var result = DummyModel.Create(null);
+
+            result.Name = Name;
+            result.Value = Value;
+
+            return result;
+        }
 
         public void InitializeWithDefaults(Object Tag) {
             if (Tag is object[]) {

@@ -81,11 +81,6 @@ namespace Common.Data {
             InitializeComponent();
         }
 
-        private void HasManyEditForm_Load(object sender, EventArgs e) {
-            // Set up the split container
-            splitContainer_Resize(sender, e);
-        }
-
         #endregion
 
         #region Static Methods
@@ -372,6 +367,17 @@ namespace Common.Data {
         #endregion
 
         #region GUI Event Handlers
+        
+        private void HasManyEditForm_Load(object sender, EventArgs e) {
+            // Set up the split container
+            splitContainer_Resize(sender, e);
+
+            FormData.LoadFormData(this);
+        }
+
+        private void HasManyEditForm_FormClosing(object sender, FormClosingEventArgs e) {
+            FormData.SaveFormData(this);
+        }
 
         private void splitContainer_Resize(object sender, EventArgs e) {
             splitContainer.SplitterDistance = splitContainer.Width / 2;
@@ -382,6 +388,65 @@ namespace Common.Data {
         }
 
         #endregion
+
+        private void List_ItemDrag(object sender, ItemDragEventArgs e) {
+            var list = (ListView)sender;
+            list.DoDragDrop(list.SelectedItems, DragDropEffects.Move);
+        }
+
+        private void List_DragEnter(object sender, DragEventArgs e) {
+            var list = (ListView)sender;
+
+            int length = e.Data.GetFormats().Length;
+            for (int i = 0; i < length; i++) {
+                if (e.Data.GetFormats()[i].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection")) {
+                    // The data from the drag source is moved to the target.	
+                    e.Effect = DragDropEffects.Move;
+                }
+            }
+        }
+
+        private void List_DragDrop(object sender, DragEventArgs e) {
+            var list = (ListView)sender;
+
+            // Returns the location of the mouse pointer in the ListView control.
+            Point cp = list.PointToClient(new Point(e.X, e.Y));
+
+            // Obtain the item that is located at the specified location of the mouse pointer.
+            ListViewItem dragToItem = list.GetItemAt(cp.X, cp.Y);
+            if (dragToItem == null) {
+                Debug.WriteLine("No item found at the drop position");
+                return;
+            }
+            
+            // Obtain the index of the item at the mouse pointer.
+            int dragIndex = dragToItem.Index;
+            ListViewItem[] selected = new ListViewItem[list.SelectedItems.Count];
+            for (int i = 0; i <= list.SelectedItems.Count - 1; i++) {
+                selected[i] = list.SelectedItems[i];
+            }
+
+            for (int i = 0; i < selected.GetLength(0); i++) {
+                // Obtain the ListViewItem to be dragged to the target location.
+                ListViewItem dragItem = selected[i];
+                int itemIndex = dragIndex;
+                if (itemIndex == dragItem.Index)
+                    return;
+                
+                if (dragItem.Index < itemIndex)
+                    itemIndex++;
+                else
+                    itemIndex = dragIndex + i;
+                
+                // Insert the item at the mouse pointer.
+                ListViewItem insertItem = (ListViewItem)dragItem.Clone();
+                list.Items.Insert(itemIndex, insertItem);
+                
+                // Removes the item from the initial location while 
+                // the item is moved to the new location.
+                list.Items.Remove(dragItem);
+            }
+        }
 
     }
 }
