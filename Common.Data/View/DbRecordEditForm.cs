@@ -56,19 +56,6 @@ namespace Common.Data {
 
         #region Constructors / Initialization
 
-        public static void EditRecords(IWin32Window Owner, String Name, String Title, List<IEditableDbRecord> Records, CreateNewRecordHandler CreateNewRecordHandler) {
-            using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
-                // Important for FormData.LoadFormData and FormData.SaveFormData
-                form.Name = Name;
-                form.Text = Title;
-                form.lblText.Text = Title;
-                if (CreateNewRecordHandler != null)
-                    form.CreateNewRecord += CreateNewRecordHandler;
-                form.Records = Records;
-                form.ShowDialog(Owner);
-            }
-        }
-
         public DbRecordEditFormForm() {
             InitializeComponent();
             ListToolStrip.Renderer = new NoBorderToolStripRenderer();
@@ -79,14 +66,36 @@ namespace Common.Data {
             EditSelectedRecord();
         }
 
-        private void ScenarioForm_Load(object sender, EventArgs e) {
-            FormData.LoadFormData(this);
-            btnAddRecord.Visible = (CreateNewRecord != null);
+        #endregion
+
+        #region Static Methods
+
+        /// <summary>
+        /// Shows a form that allows a user to select a record and edit its properties.
+        /// </summary>
+        /// <param name="Owner">Window that is the owner of the form that is shown</param>
+        /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
+        /// <param name="Title">Text to show in the form's title bar and a caption label</param>
+        /// <param name="Records">The base records from which a user may select a record for editing</param>
+        /// <param name="CreateNewRecordHandler">Event handler that is called when a user want to create a new record or duplicate an existing one</param>
+        public static void EditRecords(IWin32Window Owner, String Name, String Title, List<IEditableDbRecord> Records, CreateNewRecordHandler CreateNewRecordHandler) {
+            using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
+                // Important for FormData.LoadFormData and FormData.SaveFormData
+                form.Name = Name;
+                form.Text = Title;
+                form.lblText.Text = Title;
+                if (CreateNewRecordHandler != null)
+                    form.CreateNewRecord += CreateNewRecordHandler;
+                
+                form.Records = Records;
+                
+                form.ShowDialog(Owner);
+            }
         }
 
         #endregion
 
-        #region GUI Support
+        #region Record Selection
 
         void SelectRecord(IEditableDbRecord Record, Boolean EnsureVisibility, Boolean EditAfterSelect) {
             if (List.Items.Count <= 0)
@@ -109,6 +118,10 @@ namespace Common.Data {
             if (EditAfterSelect)
                 Item.BeginEdit();
         }
+
+        #endregion
+
+        #region Record Creation / Duplication
 
         Boolean RecordNameAlreadyExists(String Name) {
             try {
@@ -136,6 +149,10 @@ namespace Common.Data {
 
             return current_name;
         }
+
+        #endregion
+
+        #region GUI Support
 
         ListViewItem AddRecordToListView(IEditableDbRecord Record) {
             ListViewItem item = new ListViewItem();
@@ -193,7 +210,19 @@ namespace Common.Data {
 
         #region GUI Event Handlers
 
-        // TODO: Make it possible to close the window by pressing ESC
+        private void ScenarioForm_Load(object sender, EventArgs e) {
+            FormData.LoadFormData(this);
+            btnAddRecord.Visible = (CreateNewRecord != null);
+        }
+
+        private void DbRecordEditFormForm_FormClosing(object sender, FormClosingEventArgs e) {
+            FormData.SaveFormData(this);
+        }
+
+        private void DbRecordEditFormForm_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        }
 
         private void btnAddRecord_Click(object sender, EventArgs e) {
             // Create a new instance
@@ -287,10 +316,6 @@ namespace Common.Data {
             // In ListView anzeigen
             ListViewItem new_item = AddRecordToListView(duplicate);
             SelectRecord(new_item, true, true);
-        }
-
-        private void DbRecordEditFormForm_FormClosing(object sender, FormClosingEventArgs e) {
-            FormData.SaveFormData(this);
         }
 
         #endregion

@@ -85,12 +85,26 @@ namespace Common.Data {
 
         #region Static Methods
 
-        public static bool SelectRecords(IWin32Window Owner, DbRecord OwningRecord, String PropertyName) {
+        /// <summary>
+        /// Shows a form that allows a user to associate selected database records with another record.
+        /// </summary>
+        /// <param name="Owner">Window that is the owner of the form that is shown</param>
+        /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
+        /// <param name="Title">Text to show in the form's title bar and a caption label</param>
+        /// <param name="OwningRecord">Instance of a DbRecord that has a one-to-many relationship with other records</param>
+        /// <param name="PropertyName">Name of the property that holds the set of associated records (must be of type HasMany&lt;T&gt;)</param>
+        public static void SelectRecords(IWin32Window Owner, String Name, String Title,
+                DbRecord OwningRecord, String PropertyName) {
             using (var form = new HasManyEditForm()) {
+                // Important for FormData.LoadFormData and FormData.SaveFormData
+                form.Name = Name;
+                form.Text = Title;
+                form.lblText.Text = Title;
+
                 form.OwningRecord = OwningRecord;
                 form.PropertyName = PropertyName;
 
-                return (form.ShowDialog(Owner) == DialogResult.OK);
+                form.ShowDialog(Owner);
             }
         }
 
@@ -214,7 +228,7 @@ namespace Common.Data {
         /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="OwningRecords"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecords"/> property.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">Thrown when SelectedRecords, Property or HasManyType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
-        /// <exception cref="System.MethodAccessException">Thrown when the HasManyType does not contain
+        /// <exception cref="System.MemberAccessException">Thrown when the HasManyType does not contain
         /// a static method named "Read".</exception>
         /// <exception cref="System.InvalidCastException">Thrown when the list of items contained in the HasMany set (see <see cref="OwningRecord"/> and <see cref="PropertyName"/>) contains elements that cannot be cast to the DbRecord class.</exception>
         protected void ReadSelectedRecords() {
@@ -227,12 +241,12 @@ namespace Common.Data {
             if (HasManyType == null)
                 throw new ArgumentNullException("HasManyType");
 
-            // Invoke the read method
+            // Invoke the property's get method
             object list = null;
             try {
                 list = Property.GetValue(OwningRecord, null);
             } catch (Exception ex) {
-                throw new MethodAccessException("Could not get the HasMany set.", ex);
+                throw new MemberAccessException("Could not get the HasMany set.", ex);
             }
 
             if (list == null)
@@ -364,6 +378,70 @@ namespace Common.Data {
             }
         }
 
+        /// <summary>
+        /// Synchronizes the items from the list views back to the properties <see cref="SelectedRecords"/> and <see cref="UnselectedRecords"/> as well as the <see cref="OwningRecord"/>. Afterwards the record is saved to the database.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of <see cref="SelectedRecords"/>, <see cref="UnselectedRecords"/>, <see cref="Property"/> or <see cref="HasManyType"/> is null.</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when the property of the owning record could not be read.</exception>
+        /// <exception cref="System.MethodAccessException">Thrown when the update method of the owning record could not be found or called.</exception>
+        protected void UpdateOwningRecord() {
+            if (SelectedRecords == null)
+                throw new ArgumentNullException("SelectedRecords");
+
+            if (UnselectedRecords == null)
+                throw new ArgumentNullException("UnselectedRecords");
+
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (HasManyType == null)
+                throw new ArgumentNullException("HasManyType");
+
+            // Update the lists containing the selected and unselected records
+            SelectedRecords.Clear();
+            foreach (ListViewItem item in SelectedList.Items) {
+                SelectedRecords.Add((DbRecord)item.Tag);
+            }
+            UpdateUnselectedRecords();
+
+            // Invoke the property's get method
+            object list = null;
+            try {
+                list = Property.GetValue(OwningRecord, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the HasMany set.", ex);
+            }
+
+            if (list == null)
+                return;
+
+            // Transfer the selected items
+            ((IList)list).Clear();
+            SelectedRecords.ForEach(r => ((IList)list).Add(r));
+
+            // Store everything
+            // Bind to the read method
+            MethodInfo update = null;
+            try {
+                update = OwningRecord.GetType().GetMethod(
+                    "Update",
+                    BindingFlags.Public | BindingFlags.Instance,
+                    null,
+                    new Type[] { },
+                    null);
+            } catch { }
+
+            if (update == null)
+                throw new MethodAccessException("Could not find the Update method.");
+
+            // Invoke the update method
+            try {
+                update.Invoke(OwningRecord, null);
+            } catch (Exception ex) {
+                throw new MethodAccessException("Could not invoke the Update method.", ex);
+            }
+        }
+
         #endregion
 
         #region GUI Event Handlers
@@ -379,6 +457,11 @@ namespace Common.Data {
             FormData.SaveFormData(this);
         }
 
+        private void HasManyEditForm_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Escape)
+                Close();
+        }
+
         private void splitContainer_Resize(object sender, EventArgs e) {
             splitContainer.SplitterDistance = splitContainer.Width / 2;
         }
@@ -392,32 +475,6 @@ namespace Common.Data {
         #region Drag & Drop
 
         ListView DragDropSource = null;
-
-        private void List_ItemDrag(object sender, ItemDragEventArgs e) {
-            var list = (ListView)sender;
-            DragDropSource = list;
-            try {
-                list.DoDragDrop(list.SelectedItems, DragDropEffects.Move);
-            } finally {
-                DragDropSource = null;
-            }
-        }
-
-        private void List_DragEnter(object sender, DragEventArgs e) {
-            // Accept data only from our own list views
-            if (DragDropSource == null)
-                return;
-            
-            var list = (ListView)sender;
-
-            int length = e.Data.GetFormats().Length;
-            for (int i = 0; i < length; i++) {
-                if (e.Data.GetFormats()[i].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection")) {
-                    // The data from the drag source is moved to the target
-                    e.Effect = DragDropEffects.Move;
-                }
-            }
-        }
 
         protected void ProcessDragDropItems(ListView.SelectedListViewItemCollection Items, Int32 DragIndex,
                 ListView Source, ListView Target) {
@@ -462,6 +519,34 @@ namespace Common.Data {
             } finally {
                 Source.EndUpdate();
                 Target.EndUpdate();
+            }
+
+            UpdateOwningRecord();
+        }
+
+        private void List_ItemDrag(object sender, ItemDragEventArgs e) {
+            var list = (ListView)sender;
+            DragDropSource = list;
+            try {
+                list.DoDragDrop(list.SelectedItems, DragDropEffects.Move);
+            } finally {
+                DragDropSource = null;
+            }
+        }
+
+        private void List_DragEnter(object sender, DragEventArgs e) {
+            // Accept data only from our own list views
+            if (DragDropSource == null)
+                return;
+            
+            var list = (ListView)sender;
+
+            int length = e.Data.GetFormats().Length;
+            for (int i = 0; i < length; i++) {
+                if (e.Data.GetFormats()[i].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection")) {
+                    // The data from the drag source is moved to the target
+                    e.Effect = DragDropEffects.Move;
+                }
             }
         }
 

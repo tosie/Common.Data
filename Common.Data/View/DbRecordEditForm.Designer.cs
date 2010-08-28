@@ -188,7 +188,7 @@
             // lblText
             // 
             this.lblText.AutoSize = true;
-            this.lblText.Location = new System.Drawing.Point(9, 9);
+            this.lblText.Location = new System.Drawing.Point(12, 9);
             this.lblText.Name = "lblText";
             this.lblText.Size = new System.Drawing.Size(39, 13);
             this.lblText.TabIndex = 3;
@@ -207,8 +207,9 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(718, 370);
-            this.Controls.Add(this.lblText);
             this.Controls.Add(this.splitContainer);
+            this.Controls.Add(this.lblText);
+            this.KeyPreview = true;
             this.Name = "DbRecordEditFormForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
@@ -217,6 +218,7 @@
             this.Text = "<Title>";
             this.Load += new System.EventHandler(this.ScenarioForm_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DbRecordEditFormForm_FormClosing);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DbRecordEditFormForm_KeyDown);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);

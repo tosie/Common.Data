@@ -68,13 +68,13 @@ namespace Common.Data.Test
 
             DummyData.Add(DummyModel.Create(new object[] { "key1", 21 }));
             DummyData.Add(DummyModel.Create(new object[] { "key2", 22 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key4", 23 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key5", 24 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key6", 25 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key7", 26 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key8", 27 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key9", 28 }));
-            DummyData.Add(DummyModel.Create(new object[] { "key10", 29 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key3", 23 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key4", 24 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key5", 25 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key6", 26 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key7", 27 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key8", 28 }));
+            DummyData.Add(DummyModel.Create(new object[] { "key9", 29 }));
 
             DummyData.ForEach(d => d.Update());
 
@@ -123,7 +123,19 @@ namespace Common.Data.Test
             var input_record = DummySetData[0];
             var input_property = "Set";
 
-            HasManyEditForm.SelectRecords(null, input_record, input_property);
+            Assert.AreEqual(input_record.Set[0].Id, 1);
+
+            HasManyEditForm.SelectRecords(null, "DummyModelHasManyTest",
+                "Move the first item to the last position, then add the last item from the right list to the last position on the left.",
+                input_record, input_property);
+
+            Assert.AreEqual(input_record.Set[input_record.Set.Count - 2].Id, 1);
+            Assert.AreEqual(input_record.Set[input_record.Set.Count - 1].Id, 9);
+
+            var output = DummyModelHasMany.Read(1);
+
+            Assert.AreEqual(input_record.Set[output.Set.Count - 2].Id, 1);
+            Assert.AreEqual(input_record.Set[output.Set.Count - 1].Id, 9);
         }
     }
 }

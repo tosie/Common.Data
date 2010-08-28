@@ -5,7 +5,7 @@ using System.Text;
 using SubSonic.SqlGeneration.Schema;
 
 namespace Common.Data.Test {
-    class DummyModelHasMany : DbRecord, IDbRecord {
+    class DummyModelHasMany : DbRecord, IEditableDbRecord {
 
         #region Properties
 
@@ -46,7 +46,17 @@ namespace Common.Data.Test {
 
         #endregion
 
-        #region IDbRecord Members
+        #region IEditableDbRecord Members
+
+        public IEditableDbRecord Duplicate() {
+            var result = DummyModelHasMany.Create(null);
+
+            result.Name = Name;
+            result.Value = Value;
+            result.SetAsBinary = SetAsBinary;
+
+            return result;
+        }
 
         public void InitializeWithDefaults(Object Tag) {
             Set = new HasMany<DummyModel>();
