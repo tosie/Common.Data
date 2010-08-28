@@ -98,9 +98,9 @@
             listViewItem1,
             listViewItem2});
             this.SelectedList.LabelWrap = false;
-            this.SelectedList.Location = new System.Drawing.Point(6, 19);
+            this.SelectedList.Location = new System.Drawing.Point(3, 19);
             this.SelectedList.Name = "SelectedList";
-            this.SelectedList.Size = new System.Drawing.Size(282, 277);
+            this.SelectedList.Size = new System.Drawing.Size(285, 277);
             this.SelectedList.TabIndex = 1;
             this.SelectedList.UseCompatibleStateImageBehavior = false;
             this.SelectedList.View = System.Windows.Forms.View.Details;
@@ -130,9 +130,9 @@
             listViewItem3,
             listViewItem4});
             this.UnselectedList.LabelWrap = false;
-            this.UnselectedList.Location = new System.Drawing.Point(6, 19);
+            this.UnselectedList.Location = new System.Drawing.Point(3, 19);
             this.UnselectedList.Name = "UnselectedList";
-            this.UnselectedList.Size = new System.Drawing.Size(266, 277);
+            this.UnselectedList.Size = new System.Drawing.Size(269, 277);
             this.UnselectedList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UnselectedList.TabIndex = 2;
             this.UnselectedList.UseCompatibleStateImageBehavior = false;

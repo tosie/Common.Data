@@ -389,64 +389,121 @@ namespace Common.Data {
 
         #endregion
 
+        #region Drag & Drop
+
+        ListView DragDropSource = null;
+
         private void List_ItemDrag(object sender, ItemDragEventArgs e) {
             var list = (ListView)sender;
-            list.DoDragDrop(list.SelectedItems, DragDropEffects.Move);
+            DragDropSource = list;
+            try {
+                list.DoDragDrop(list.SelectedItems, DragDropEffects.Move);
+            } finally {
+                DragDropSource = null;
+            }
         }
 
         private void List_DragEnter(object sender, DragEventArgs e) {
+            // Accept data only from our own list views
+            if (DragDropSource == null)
+                return;
+            
             var list = (ListView)sender;
 
             int length = e.Data.GetFormats().Length;
             for (int i = 0; i < length; i++) {
                 if (e.Data.GetFormats()[i].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection")) {
-                    // The data from the drag source is moved to the target.	
+                    // The data from the drag source is moved to the target
                     e.Effect = DragDropEffects.Move;
                 }
             }
         }
 
-        private void List_DragDrop(object sender, DragEventArgs e) {
-            var list = (ListView)sender;
+        protected void ProcessDragDropItems(ListView.SelectedListViewItemCollection Items, Int32 DragIndex,
+                ListView Source, ListView Target) {
+            if (Items == null)
+                throw new ArgumentNullException("Items");
 
-            // Returns the location of the mouse pointer in the ListView control.
-            Point cp = list.PointToClient(new Point(e.X, e.Y));
+            if (Source == null)
+                throw new ArgumentNullException("Source");
 
-            // Obtain the item that is located at the specified location of the mouse pointer.
-            ListViewItem dragToItem = list.GetItemAt(cp.X, cp.Y);
-            if (dragToItem == null) {
-                Debug.WriteLine("No item found at the drop position");
-                return;
-            }
-            
-            // Obtain the index of the item at the mouse pointer.
-            int dragIndex = dragToItem.Index;
-            ListViewItem[] selected = new ListViewItem[list.SelectedItems.Count];
-            for (int i = 0; i <= list.SelectedItems.Count - 1; i++) {
-                selected[i] = list.SelectedItems[i];
+            if (Target == null)
+                throw new ArgumentNullException("Target");
+
+            ListViewItem[] selected = new ListViewItem[Items.Count];
+            for (int i = 0; i < Items.Count; i++) {
+                selected[i] = Items[i];
             }
 
-            for (int i = 0; i < selected.GetLength(0); i++) {
-                // Obtain the ListViewItem to be dragged to the target location.
-                ListViewItem dragItem = selected[i];
-                int itemIndex = dragIndex;
-                if (itemIndex == dragItem.Index)
-                    return;
-                
-                if (dragItem.Index < itemIndex)
-                    itemIndex++;
-                else
-                    itemIndex = dragIndex + i;
-                
-                // Insert the item at the mouse pointer.
-                ListViewItem insertItem = (ListViewItem)dragItem.Clone();
-                list.Items.Insert(itemIndex, insertItem);
-                
-                // Removes the item from the initial location while 
-                // the item is moved to the new location.
-                list.Items.Remove(dragItem);
+            Source.BeginUpdate();
+            Target.BeginUpdate();
+
+            try {
+
+                for (int i = 0; i < selected.Length; i++) {
+                    ListViewItem dragItem = selected[i];
+                    int itemIndex = DragIndex;
+
+                    if (dragItem.Index < itemIndex)
+                        itemIndex++;
+                    else
+                        itemIndex = DragIndex + i;
+
+                    // Insert the item at the mouse pointer
+                    ListViewItem insertItem = (ListViewItem)dragItem.Clone();
+                    if (itemIndex >= Target.Items.Count)
+                        Target.Items.Add(insertItem);
+                    else
+                        Target.Items.Insert(itemIndex, insertItem);
+
+                    // Remove the item from the source list
+                    Source.Items.Remove(Items[i]);
+                }
+            } finally {
+                Source.EndUpdate();
+                Target.EndUpdate();
             }
         }
+
+        private void List_DragDrop(object sender, DragEventArgs e) {
+            // Accept data only from our own list views
+            if (DragDropSource == null)
+                return;
+
+            var list = (ListView)sender;
+
+            // Returns the location of the mouse pointer in the ListView control
+            Point cp = list.PointToClient(new Point(e.X, e.Y));
+
+            // Obtain the item that is located at the specified location of the mouse pointer
+            ListViewItem dragToItem = list.GetItemAt(cp.X, cp.Y);
+            
+            // Obtain the index of the item at the mouse pointer
+            int dragIndex = (dragToItem == null ? list.Items.Count : dragToItem.Index);
+
+            bool fromExternalSource = DragDropSource != list;
+            if (fromExternalSource) {
+                // Move items from one list view to another one
+
+                int length = e.Data.GetFormats().Length;
+                for (int k = 0; k < length; k++) {
+                    if (!e.Data.GetFormats()[k].Equals("System.Windows.Forms.ListView+SelectedListViewItemCollection"))
+                        continue;
+
+                    Type datatype = typeof(ListView.SelectedListViewItemCollection);
+                    ListView.SelectedListViewItemCollection data;
+                    data = (ListView.SelectedListViewItemCollection)e.Data.GetData(datatype);
+
+                    ProcessDragDropItems(data, dragIndex, DragDropSource, list);
+                }
+            } else {
+                // Reorder items inside one list view
+
+                ProcessDragDropItems(list.SelectedItems, dragIndex, list, list);
+            }
+        }
+
+        #endregion
 
     }
 }
