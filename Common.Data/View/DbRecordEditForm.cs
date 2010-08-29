@@ -180,20 +180,24 @@ namespace Common.Data {
         }
 
         void EditSelectedRecord() {
-            if (SelectedRecord == null) {
-                //splitContainer.Panel2.Enabled = false;
-                //Grid.BackColor = SystemColors.ControlLight;
-            } else if (LastSelection != SelectedRecord) {
-                splitContainer.Panel2.Enabled = true;
-                //Grid.BackColor = SystemColors.Window;
+            LoadingRecord = true;
 
-                LoadingRecord = true;
+            try {
+                if (SelectedRecord == null) {
+                    splitContainer.Panel2.Enabled = false;
+                    //Grid.BackColor = SystemColors.ControlLight;
 
-                ConfigControl.Configuration = GenericConfiguration.CreateFor(SelectedRecord);
-                foreach (ConfigurationEntry entry in ConfigControl.Configuration) {
-                    entry.PropertyChanged += new PropertyChangedEventHandler(entry_PropertyChanged);
+                    ConfigControl.Configuration = null;
+                } else if (LastSelection != SelectedRecord) {
+                    splitContainer.Panel2.Enabled = true;
+                    //Grid.BackColor = SystemColors.Window;
+
+                    ConfigControl.Configuration = GenericConfiguration.CreateFor(SelectedRecord);
+                    foreach (ConfigurationEntry entry in ConfigControl.Configuration) {
+                        entry.PropertyChanged += new PropertyChangedEventHandler(entry_PropertyChanged);
+                    }
                 }
-
+            } finally {
                 LoadingRecord = false;
             }
         }

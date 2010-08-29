@@ -16,7 +16,7 @@ namespace Common.Data.Test {
         public String Name { get; set; }
 
         [Configuration("Value", 20, "Common",
-            ControlType = ConfigurationEntry.ControlTypes.TextBox,
+            ControlType = ConfigurationEntry.ControlTypes.Slider,
             Minimum = 0, Maximum = 200, Validator = "Int32")]
         public Int32 Value { get; set; }
 

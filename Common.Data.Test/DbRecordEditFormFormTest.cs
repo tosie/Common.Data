@@ -88,6 +88,13 @@ namespace Common.Data.Test
             set1.Set.Add(DummyData[6]);
             set1.Set.Add(DummyData[2]);
             set1.Update();
+
+            var set2 = DummyModelHasMany.Create(new object[] { "set2", 32 });
+            DummySetData.Add(set2);
+            set2.Set.Add(DummyData[3]);
+            set2.Set.Add(DummyData[4]);
+            set2.Set.Add(DummyData[5]);
+            set2.Update();
         }
 
         #endregion
