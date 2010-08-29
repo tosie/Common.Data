@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Diagnostics;
 using Common.Configuration;
+using System.Reflection;
 
 namespace Common.Data {
     public partial class DbRecordEditFormForm : Form {
@@ -15,6 +16,7 @@ namespace Common.Data {
         #region Properties / Class Variables
 
         protected List<IEditableDbRecord> records;
+        
         public List<IEditableDbRecord> Records {
             get {
                 return records;
@@ -25,6 +27,31 @@ namespace Common.Data {
                 ShowRecords();
             }
         }
+
+        protected Type recordType;
+
+        public Type RecordType {
+            get {
+                return recordType;
+            }
+
+            set {
+                try {
+                    createRecord = RecordType.GetMethod(
+                        "Create",
+                        BindingFlags.Public | BindingFlags.Static,
+                        null,
+                        new Type[] { },
+                        null);
+                } catch {
+                    createRecord = null;
+                }
+
+                btnAddRecord.Visible = createRecord != null;
+            }
+        }
+
+        protected MethodInfo createRecord = null;
 
         protected IEditableDbRecord LastSelection { get; set; }
         protected IEditableDbRecord SelectedRecord {
@@ -37,20 +64,6 @@ namespace Common.Data {
         }
 
         protected Boolean LoadingRecord { get; set; }
-
-        #endregion
-
-        #region Events
-
-        // TODO: So umschreiben, dass man ohne Event auskommt (Reflection nutzen)!
-        public delegate IEditableDbRecord CreateNewRecordHandler(String SuggestedName);
-        public event CreateNewRecordHandler CreateNewRecord;
-        protected IEditableDbRecord RaiseCreateNewRecord(String SuggestedName) {
-            if (CreateNewRecord == null)
-                return null;
-
-            return CreateNewRecord(SuggestedName);
-        }
 
         #endregion
 
@@ -77,21 +90,20 @@ namespace Common.Data {
         /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
         /// <param name="Records">The base records from which a user may select a record for editing</param>
-        /// <param name="CreateNewRecordHandler">Event handler that is called when a user want to create a new record or duplicate an existing one</param>
-        public static void EditRecords(IWin32Window Owner, String Name, String Title, List<IEditableDbRecord> Records, CreateNewRecordHandler CreateNewRecordHandler) {
+        public static void EditRecords(IWin32Window Owner, String Name, String Title,
+                Type RecordType, List<IEditableDbRecord> Records) {
             using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
                 // Important for FormData.LoadFormData and FormData.SaveFormData
                 form.Name = Name;
                 form.Text = Title;
                 form.lblText.Text = Title;
-                if (CreateNewRecordHandler != null)
-                    form.CreateNewRecord += CreateNewRecordHandler;
-                
+
                 form.Records = Records;
+                form.RecordType = RecordType;
 
                 if (Owner == null)
                     form.ShowInTaskbar = true;
-                
+
                 form.ShowDialog(Owner);
             }
         }
@@ -125,6 +137,18 @@ namespace Common.Data {
         #endregion
 
         #region Record Creation / Duplication
+
+        protected IEditableDbRecord CreateNewRecord(String SuggestedName) {
+            if (createRecord == null)
+                return null;
+
+            IEditableDbRecord result = (IEditableDbRecord)createRecord.Invoke(null, null);
+
+            result.Name = SuggestedName;
+            result.Update();
+
+            return result;
+        }
 
         Boolean RecordNameAlreadyExists(String Name) {
             try {
@@ -219,7 +243,6 @@ namespace Common.Data {
 
         private void ScenarioForm_Load(object sender, EventArgs e) {
             FormData.LoadFormData(this);
-            btnAddRecord.Visible = (CreateNewRecord != null);
         }
 
         private void DbRecordEditFormForm_FormClosing(object sender, FormClosingEventArgs e) {
@@ -233,7 +256,7 @@ namespace Common.Data {
 
         private void btnAddRecord_Click(object sender, EventArgs e) {
             // Create a new instance
-            IEditableDbRecord new_record = RaiseCreateNewRecord(FindNewNameForRecord("Neuer Eintrag"));
+            IEditableDbRecord new_record = CreateNewRecord(FindNewNameForRecord("Neuer Eintrag"));
             if (new_record == null)
                 return;
 
