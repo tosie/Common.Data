@@ -89,12 +89,13 @@ namespace Common.Data {
         /// Shows a form that allows a user to associate selected database records with another record.
         /// </summary>
         /// <param name="Owner">Window that is the owner of the form that is shown</param>
-        /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
         /// <param name="OwningRecord">Instance of a DbRecord that has a one-to-many relationship with other records</param>
         /// <param name="PropertyName">Name of the property that holds the set of associated records (must be of type HasMany&lt;T&gt;)</param>
-        public static void SelectRecords(IWin32Window Owner, String Name, String Title,
+        public static void SelectRecords(IWin32Window Owner, String Title,
                 DbRecord OwningRecord, String PropertyName) {
+            String Name = OwningRecord.GetType().Name + "." + PropertyName;
+
             using (var form = new HasManyEditForm()) {
                 // Important for FormData.LoadFormData and FormData.SaveFormData
                 form.Name = Name;

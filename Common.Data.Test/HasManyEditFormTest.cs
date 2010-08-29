@@ -125,7 +125,7 @@ namespace Common.Data.Test
 
             Assert.AreEqual(input_record.Set[0].Id, 1);
 
-            HasManyEditForm.SelectRecords(null, "DummyModelHasManyTest",
+            HasManyEditForm.SelectRecords(null,
                 "Move the first item to the last position, then add the last item from the right list to the last position on the left.",
                 input_record, input_property);
 

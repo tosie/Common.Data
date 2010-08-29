@@ -29,8 +29,7 @@ namespace Common.Data.Test {
             set { Set.BinaryData = value; }
         }
         bool SetEditor(ConfigurationEntry Sender, IWin32Window Owner) {
-            HasManyEditForm.SelectRecords(Owner, "DummyModelHasManySetEditor",
-                "Play around", this, "Set");
+            HasManyEditForm.SelectRecords(Owner, "Play around", this, "Set");
 
             // Nothing else to save, the has-many-set has been saved by the edit form.
             return false;

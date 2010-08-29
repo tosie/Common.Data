@@ -105,18 +105,10 @@ namespace Common.Data.Test
         ///</summary>
         [TestMethod()]
         public void EditRecordsTest() {
-            var input = new List<IEditableDbRecord>(DummySetData.Count);
-            foreach (var item in DummySetData) {
-                input.Add(item);
-            }
-
-
             DbRecordEditFormForm.EditRecords(
                 null,
-                "EditRecordsTest",
-                "Not sure, yet.",
-                input,
-                null);
+                "Test",
+                typeof(DummyModelHasMany));
             
             Assert.Inconclusive("A method that does not return a value cannot be verified.");
         }
