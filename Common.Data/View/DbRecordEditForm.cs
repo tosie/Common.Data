@@ -88,6 +88,9 @@ namespace Common.Data {
                     form.CreateNewRecord += CreateNewRecordHandler;
                 
                 form.Records = Records;
+
+                if (Owner == null)
+                    form.ShowInTaskbar = true;
                 
                 form.ShowDialog(Owner);
             }
@@ -178,7 +181,7 @@ namespace Common.Data {
 
         void EditSelectedRecord() {
             if (SelectedRecord == null) {
-                splitContainer.Panel2.Enabled = false;
+                //splitContainer.Panel2.Enabled = false;
                 //Grid.BackColor = SystemColors.ControlLight;
             } else if (LastSelection != SelectedRecord) {
                 splitContainer.Panel2.Enabled = true;

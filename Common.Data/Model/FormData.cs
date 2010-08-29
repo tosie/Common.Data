@@ -16,7 +16,7 @@ namespace Common.Data {
         [SubSonicIgnore]
         public new Int64 Id { get; set; }
 
-        [SubSonicPrimaryKey]
+        [SubSonicPrimaryKey(false)]
         public String Name { get; set; }
 
         public Int32 Left { get; set; }
@@ -95,7 +95,15 @@ namespace Common.Data {
         public static SimpleRepository ActiveRepository;
 
         public static FormData Create(Object Tag) {
-            return FormData.Create<FormData>(ActiveRepository, Tag);
+            var data = FormData.Create<FormData>(ActiveRepository, Tag);
+
+            // For some reason the Name property's value is replaced by an auto-incrementing value ...
+            if (Tag != null && Tag is Form) {
+                data.Name = ((Form)Tag).Name;
+                data.Update();
+            }
+
+            return data;
         }
 
         public static FormData Read(Int64 Id) {

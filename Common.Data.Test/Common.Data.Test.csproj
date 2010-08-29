@@ -57,6 +57,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DbRecordEditFormFormTest.cs" />
     <Compile Include="DummyModel.cs" />
     <Compile Include="DummyModelHasMany.cs" />
     <Compile Include="HasManyEditFormTest.cs" />

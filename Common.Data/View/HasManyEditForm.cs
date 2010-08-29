@@ -104,6 +104,9 @@ namespace Common.Data {
                 form.OwningRecord = OwningRecord;
                 form.PropertyName = PropertyName;
 
+                if (Owner == null)
+                    form.ShowInTaskbar = true;
+
                 form.ShowDialog(Owner);
             }
         }
@@ -514,7 +517,7 @@ namespace Common.Data {
                         Target.Items.Insert(itemIndex, insertItem);
 
                     // Remove the item from the source list
-                    Source.Items.Remove(Items[i]);
+                    Source.Items.Remove(selected[i]);
                 }
             } finally {
                 Source.EndUpdate();

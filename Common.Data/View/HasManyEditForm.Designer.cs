@@ -23,10 +23,10 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
-            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem5 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem6 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem7 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem8 = new System.Windows.Forms.ListViewItem("Item 2");
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.SelectedList = new Common.Data.FasterListView();
             this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
@@ -53,11 +53,13 @@
             // 
             this.splitContainer.Panel1.Controls.Add(this.SelectedList);
             this.splitContainer.Panel1.Controls.Add(this.label1);
+            this.splitContainer.Panel1.Padding = new System.Windows.Forms.Padding(3);
             // 
             // splitContainer.Panel2
             // 
             this.splitContainer.Panel2.Controls.Add(this.UnselectedList);
             this.splitContainer.Panel2.Controls.Add(this.label2);
+            this.splitContainer.Panel2.Padding = new System.Windows.Forms.Padding(3);
             this.splitContainer.Size = new System.Drawing.Size(570, 286);
             this.splitContainer.SplitterDistance = 291;
             this.splitContainer.TabIndex = 0;
@@ -66,6 +68,9 @@
             // SelectedList
             // 
             this.SelectedList.AllowDrop = true;
+            this.SelectedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+                        | System.Windows.Forms.AnchorStyles.Left)
+                        | System.Windows.Forms.AnchorStyles.Right)));
             this.SelectedList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1});
             this.SelectedList.FullRowSelect = true;
@@ -73,12 +78,12 @@
             this.SelectedList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.SelectedList.HideSelection = false;
             this.SelectedList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
+            listViewItem5,
+            listViewItem6});
             this.SelectedList.LabelWrap = false;
-            this.SelectedList.Location = new System.Drawing.Point(3, 19);
+            this.SelectedList.Location = new System.Drawing.Point(6, 22);
             this.SelectedList.Name = "SelectedList";
-            this.SelectedList.Size = new System.Drawing.Size(285, 277);
+            this.SelectedList.Size = new System.Drawing.Size(279, 258);
             this.SelectedList.TabIndex = 1;
             this.SelectedList.UseCompatibleStateImageBehavior = false;
             this.SelectedList.View = System.Windows.Forms.View.Details;
@@ -95,7 +100,7 @@
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(3, 3);
+            this.label1.Location = new System.Drawing.Point(6, 6);
             this.label1.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(65, 13);
@@ -115,12 +120,12 @@
             this.UnselectedList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.UnselectedList.HideSelection = false;
             this.UnselectedList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem3,
-            listViewItem4});
+            listViewItem7,
+            listViewItem8});
             this.UnselectedList.LabelWrap = false;
-            this.UnselectedList.Location = new System.Drawing.Point(3, 19);
+            this.UnselectedList.Location = new System.Drawing.Point(6, 22);
             this.UnselectedList.Name = "UnselectedList";
-            this.UnselectedList.Size = new System.Drawing.Size(269, 264);
+            this.UnselectedList.Size = new System.Drawing.Size(263, 258);
             this.UnselectedList.Sorting = System.Windows.Forms.SortOrder.Ascending;
             this.UnselectedList.TabIndex = 2;
             this.UnselectedList.UseCompatibleStateImageBehavior = false;
@@ -138,7 +143,7 @@
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(3, 3);
+            this.label2.Location = new System.Drawing.Point(6, 6);
             this.label2.Margin = new System.Windows.Forms.Padding(3, 3, 3, 0);
             this.label2.Name = "label2";
             this.label2.Size = new System.Drawing.Size(56, 13);
