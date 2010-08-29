@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using System.Diagnostics;
 using Common.Configuration;
 using System.Reflection;
+using System.Collections;
 
 namespace Common.Data {
     public partial class DbRecordEditFormForm : Form {
@@ -36,8 +37,10 @@ namespace Common.Data {
             }
 
             set {
+                recordType = value;
+
                 try {
-                    createRecord = RecordType.GetMethod(
+                    createRecord = recordType.GetMethod(
                         "Create",
                         BindingFlags.Public | BindingFlags.Static,
                         null,
@@ -87,9 +90,54 @@ namespace Common.Data {
         /// Shows a form that allows a user to select a record and edit its properties.
         /// </summary>
         /// <param name="Owner">Window that is the owner of the form that is shown</param>
+        /// <param name="Title">Text to show in the form's title bar and a caption label</param>
+        /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
+        public static void EditRecords(IWin32Window Owner, String Title, Type RecordType) {
+            String Name = RecordType.Name;
+            List<IEditableDbRecord> Records;
+
+            try {
+                MethodInfo read = RecordType.GetMethod(
+                    "Read",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new Type[] { },
+                    null);
+
+                IList read_result = (IList)read.Invoke(null, null);
+
+                Records = new List<IEditableDbRecord>(read_result.Count);
+                for (int i = 0; i < read_result.Count; i++) {
+                    Records.Add((IEditableDbRecord)read_result[i]);
+                }
+            } catch {
+                Records = new List<IEditableDbRecord>();
+            }
+
+            using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
+                // Important for FormData.LoadFormData and FormData.SaveFormData
+                form.Name = Name;
+                form.Text = Title;
+                form.lblText.Text = Title;
+
+                form.Records = Records;
+                form.RecordType = RecordType;
+
+                if (Owner == null)
+                    form.ShowInTaskbar = true;
+
+                form.ShowDialog(Owner);
+            }
+        }
+
+        /// <summary>
+        /// Shows a form that allows a user to select a record and edit its properties.
+        /// </summary>
+        /// <param name="Owner">Window that is the owner of the form that is shown</param>
         /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
         /// <param name="Records">The base records from which a user may select a record for editing</param>
+        /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
         public static void EditRecords(IWin32Window Owner, String Name, String Title,
                 Type RecordType, List<IEditableDbRecord> Records) {
             using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
