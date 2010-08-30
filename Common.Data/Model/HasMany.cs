@@ -253,11 +253,11 @@ namespace Common.Data {
         }
 
         public bool IsSynchronized {
-            get { throw new NotImplementedException(); }
+            get { return false; }
         }
 
         public object SyncRoot {
-            get { throw new NotImplementedException(); }
+            get { return null; }
         }
 
         #endregion

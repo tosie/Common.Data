@@ -55,7 +55,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// The type of the property as specified by PropertyName.
+        /// The property as specified by PropertyName.
         /// </summary>
         /// <see cref="InitializePropertyReflection"/>
         protected PropertyInfo Property { get; set; }
