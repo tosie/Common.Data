@@ -7,7 +7,7 @@ using System.Windows.Forms;
 
 namespace Common.Data {
     // See: http://www.virtualdub.org/blog/pivot/entry.php?id=273
-    class FasterListView : ListView {
+    public class FasterListView : ListView {
         
         [DllImport("user32.dll")]
         private static extern bool SendMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
