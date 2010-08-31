@@ -77,7 +77,7 @@ namespace Common.Data {
 
         #region Construtor / Initialization
 
-        public HasManyEditForm() {
+        protected HasManyEditForm() {
             InitializeComponent();
         }
 
