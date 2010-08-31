@@ -329,6 +329,49 @@ namespace Common.Data {
             return true;
         }
 
+        /// <summary>
+        /// Method to remove many records at once.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Records"></param>
+        /// <returns></returns>
+        public static bool Delete<T>(List<T> Records) where T : DbRecord, IDbRecord, new() {
+            if (Records == null)
+                return true;
+
+            // Event handler
+            bool can_delete = true;
+            Records.ForEach(r => can_delete = can_delete && r.BeforeDelete());
+
+            if (!can_delete)
+                return false;
+
+            // Group by OwningRepository
+            var by_repository = new Dictionary<SimpleRepository, List<T>>();
+            Records.ForEach(r => {
+                if (!by_repository.ContainsKey(r.OwningRepository))
+                    by_repository[r.OwningRepository] = new List<T>();
+
+                by_repository[r.OwningRepository].Add(r);
+            });
+
+            // Delete from cache and database
+            foreach (var repository in by_repository.Keys) {
+                // Delete from cache
+                List<T> cache = GetCache<T>(repository);
+                by_repository[repository].ForEach(r => cache.Remove(r));
+
+                // Delete from database
+                repository.DeleteMany<T>(by_repository[repository]);
+
+                // Remember that something has been deleted from this repository
+                // (so that vacuum is not done on all repositories)
+                SharedObjects.Instance.NeedsVacuum[repository] = true;
+            }
+
+            return true;
+        }
+
         #endregion
 
     }

@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.Configuration;
 using System.IO;
+using System.Diagnostics;
 
 namespace Common.Data.Test
 {
@@ -47,19 +48,14 @@ namespace Common.Data.Test
         
         [TestInitialize()]
         public void MyTestInitialize() {
-            tempdb = Path.Combine(testContextInstance.TestDir, "Data.sdb");
-            if (File.Exists(tempdb))
-                File.Delete(tempdb);
-
-            SharedObjects.Instance.SetupRepository("Data Source=" + tempdb, "System.Data.SQLite");
+            Global.BeforeTest(testContextInstance.TestDir);
 
             InitializeDummyData();
         }
 
         [TestCleanup()]
         public void MyTestCleanup() {
-            if (File.Exists(tempdb))
-                File.Delete(tempdb);
+            Global.AfterTest();
         }
 
         static List<DummyModel> DummyData;
@@ -79,7 +75,7 @@ namespace Common.Data.Test
             //   - 1
             //   - 2
             DummyBinaryData = new byte[] {
-                31, 139, 8, 0, 0, 0, 0, 0, 4, 0, 237, 189, 7, 96, 28, 73, 150, 37, 38, 47, 109, 202, 123, 127, 74, 245, 74, 215, 224, 116, 161, 8, 128, 96, 19, 36, 216, 144, 64, 16, 236, 193, 136, 205, 230, 146, 236, 29, 105, 71, 35, 41, 171, 42, 129, 202, 101, 86, 101, 93, 102, 22, 64, 204, 237, 157, 188, 247, 222, 123, 239, 189, 247, 222, 123, 239, 189, 247, 186, 59, 157, 78, 39, 247, 223, 255, 63, 92, 102, 100, 1, 108, 246, 206, 74, 218, 201, 158, 33, 128, 170, 200, 31, 63, 126, 124, 31, 63, 34, 118, 147, 189, 228, 94, 242, 255, 0, 216, 84, 95, 119, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+                31, 139, 8, 0, 0, 0, 0, 0, 4, 0, 236, 189, 7, 96, 28, 73, 150, 37, 38, 47, 109, 202, 123, 127, 74, 245, 74, 215, 224, 116, 161, 8, 128, 96, 19, 36, 216, 144, 64, 16, 236, 193, 136, 205, 230, 146, 236, 29, 105, 71, 35, 41, 171, 42, 129, 202, 101, 86, 101, 93, 102, 22, 64, 204, 237, 157, 188, 247, 222, 123, 239, 189, 247, 222, 123, 239, 189, 247, 186, 59, 157, 78, 39, 247, 223, 255, 63, 92, 102, 100, 1, 108, 246, 206, 74, 218, 201, 158, 33, 128, 170, 200, 31, 63, 126, 124, 31, 63, 34, 30, 36, 7, 201, 195, 228, 255, 9, 0, 0, 255, 255, 43, 191, 84, 52, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
             };
         }
 
@@ -140,6 +136,15 @@ namespace Common.Data.Test
 
             Assert.AreEqual(expected.Length, output.Length);
 
+#if DEBUG
+            // Code to output the binary data:
+            string[] test = new string[output.Length];
+            for (int i = 0; i < output.Length; i++) {
+                test[i] = Convert.ToString(output[i]);
+            }
+            Debug.WriteLine("Expexted data: " + String.Join(", ", test), "BinaryDataSerializeTest");
+#endif
+
             bool are_equal = true;
             for (int i = 0; i < output.Length; i++) {
                 if (expected[i] != output[i]) {
@@ -152,7 +157,7 @@ namespace Common.Data.Test
 
         [TestMethod()]
         public void BinaryDataDeserializeTest() {
-            HasMany_Accessor<DummyModel> target = new HasMany_Accessor<DummyModel>();
+            var target = new HasMany_Accessor<DummyModel>();
 
             var input = DummyBinaryData;
             var expected = DummyData;

@@ -3,6 +3,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
+using System;
+using System.Reflection;
+using System.Diagnostics;
 
 namespace Common.Data.Test
 {
@@ -33,8 +36,6 @@ namespace Common.Data.Test
 
         #region Additional test attributes
 
-        static string tempdb;
-
         [ClassInitialize()]
         public static void MyClassInitialize(TestContext testContext) {
         }
@@ -45,25 +46,23 @@ namespace Common.Data.Test
 
         [TestInitialize()]
         public void MyTestInitialize() {
-            tempdb = Path.Combine(testContextInstance.TestDir, "Data.sdb");
-            if (File.Exists(tempdb))
-                File.Delete(tempdb);
-
-            SharedObjects.Instance.SetupRepository("Data Source=" + tempdb, "System.Data.SQLite");
+            Global.BeforeTest(testContextInstance.TestDir);
 
             InitializeDummyData();
         }
 
         [TestCleanup()]
         public void MyTestCleanup() {
-            if (File.Exists(tempdb))
-                File.Delete(tempdb);
+            Global.AfterTest();
         }
 
         static List<DummyModel> DummyData;
         static List<DummyModelHasMany> DummySetData;
         
         static void InitializeDummyData() {
+            List<DummyModel> prev = DummyModel.Read();
+            Debug.WriteLine(String.Format("prev = {0}", prev.Count));
+
             DummyData = new List<DummyModel>();
 
             DummyData.Add(DummyModel.Create(new object[] { "key1", 21 }));
@@ -98,7 +97,7 @@ namespace Common.Data.Test
         ///</summary>
         [TestMethod()]
         public void UpdateDataTest() {
-            HasManyEditForm target = new HasManyEditForm();
+            var target = new HasManyEditForm();
 
             var input_record = DummySetData[0];
             var input_property = "Set";
