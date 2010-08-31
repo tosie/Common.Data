@@ -159,10 +159,12 @@ namespace Common.Data.Test
         public void BinaryDataDeserializeTest() {
             var target = new HasMany_Accessor<DummyModel>();
 
-            var input = DummyBinaryData;
+            var input = DummyData;
             var expected = DummyData;
 
-            target.BinaryData = input;
+            target.Data = input;
+            byte[] bindata = target.BinaryData;
+            target.BinaryData = bindata;
             var output = target.Data;
 
             Assert.AreEqual(expected.Count, output.Count);

@@ -104,6 +104,7 @@ namespace Common.Data.Test
         ///A test for EditRecords
         ///</summary>
         [TestMethod()]
+        [Ignore]
         public void EditRecordsTest() {
             DbRecordEditFormForm.EditRecords(
                 null,

@@ -60,9 +60,6 @@ namespace Common.Data.Test
         static List<DummyModelHasMany> DummySetData;
         
         static void InitializeDummyData() {
-            List<DummyModel> prev = DummyModel.Read();
-            Debug.WriteLine(String.Format("prev = {0}", prev.Count));
-
             DummyData = new List<DummyModel>();
 
             DummyData.Add(DummyModel.Create(new object[] { "key1", 21 }));
@@ -109,32 +106,27 @@ namespace Common.Data.Test
             Assert.AreEqual(DummySetData[0].Set.Count, target.SelectedRecords.Count, "SelectedRecords count");
             Assert.AreEqual(DummyData.Count - DummySetData[0].Set.Count, target.UnselectedRecords.Count, "UnselectedRecords count");
 
-            Assert.AreEqual(DummyData[0].Id, target.SelectedRecords[0].Id, "First selected record");
-            Assert.AreEqual(DummyData[1].Id, target.UnselectedRecords[0].Id, "First unselected record");
+            Assert.AreEqual(DummyData[0].Value, ((DummyModel)target.SelectedRecords[0]).Value, "First selected record");
+            Assert.AreEqual(DummyData[1].Value, ((DummyModel)target.UnselectedRecords[0]).Value, "First unselected record");
         }
 
         /// <summary>
         /// Shows the HasManyEditForm (thus, this test is ignored and must be called manually).
         ///</summary>
         [TestMethod()]
-        //[Ignore]
+        [Ignore]
         public void SelectRecordsTest() {
             var input_record = DummySetData[0];
             var input_property = "Set";
 
-            Assert.AreEqual(input_record.Set[0].Id, 1);
+            Assert.AreEqual(21, input_record.Set[0].Value);
 
             HasManyEditForm.SelectRecords(null,
                 "Move the first item to the last position, then add the last item from the right list to the last position on the left.",
                 input_record, input_property);
 
-            Assert.AreEqual(input_record.Set[input_record.Set.Count - 2].Id, 1);
-            Assert.AreEqual(input_record.Set[input_record.Set.Count - 1].Id, 9);
-
-            var output = DummyModelHasMany.Read(1);
-
-            Assert.AreEqual(input_record.Set[output.Set.Count - 2].Id, 1);
-            Assert.AreEqual(input_record.Set[output.Set.Count - 1].Id, 9);
+            Assert.AreEqual(21, input_record.Set[input_record.Set.Count - 2].Value);
+            Assert.AreEqual(29, input_record.Set[input_record.Set.Count - 1].Value);
         }
     }
 }

@@ -6,6 +6,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Common.Data {
     public class HasMany<T> : IList<T>, IList where T : DbRecord, IDbRecord, new() {
@@ -86,12 +87,17 @@ namespace Common.Data {
             // Method to call when reading from the database
             // (this is assumed to be there since T has to be
             // a descendent of DbRecord).
-            MethodInfo method = typeof(T).GetMethod(
-                "Read",
-                BindingFlags.Public | BindingFlags.Static,
-                null,
-                new Type[] { typeof(long) },
-                null);
+            MethodInfo method;
+            try {
+                method = typeof(T).GetMethod(
+                    "Read",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new Type[] { typeof(long) },
+                    null);
+            } catch {
+                return new List<T>();
+            }
 
             // Decompress and deserialize the data
             var result = new List<T>();
@@ -103,7 +109,8 @@ namespace Common.Data {
                             long id;
                             if (long.TryParse(sid, out id)) {
                                 T record = (T)method.Invoke(null, new object[] { id });
-                                result.Add(record);
+                                if (record != null)
+                                    result.Add(record);
                             }
                         }
                     }
