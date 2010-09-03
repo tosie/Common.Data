@@ -108,6 +108,12 @@
     </Compile>
     <Compile Include="ViewHelpers\Messages.cs" />
     <Compile Include="ViewHelpers\NoBorderToolStripRenderer.cs" />
+    <Compile Include="View\CollectionEditForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\CollectionEditForm.Designer.cs">
+      <DependentUpon>CollectionEditForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\DbRecordEditForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -131,6 +137,9 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\CollectionEditForm.resx">
+      <DependentUpon>CollectionEditForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="View\DbRecordEditForm.resx">
       <DependentUpon>DbRecordEditForm.cs</DependentUpon>
