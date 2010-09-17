@@ -149,6 +149,9 @@
     <Content Include="Libs\x86\System.Data.SQLite.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="Licenses\SubSonic.Core.License.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\ActionGlyph.png" />
     <Content Include="Resources\CircularMinus.png" />
     <Content Include="Resources\CircularPlus.png" />
