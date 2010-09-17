@@ -9,8 +9,9 @@ set outdir=Release
 
 set ilmerge="%programfiles%\Microsoft\ILMerge\ILMerge.exe"
 set ilmerge_params=/wildcards /ndebug /lib:%outdir% /target:library
-set package=Common.Data.dll
+set package=%outdir%\Common.Data.dll
 set assemblies=Common.Data.dll SubSonic.Core.dll
+set to_delete=SubSonic.dll
 
 if not exist %msb% goto msbuild_not_found
 goto do_build
@@ -30,17 +31,16 @@ if not exist %ilmerge% goto ilmerge_not_found
 echo.
 echo Merging assemblies ...
 echo   Assemblies = %assemblies%
-%ilmerge% %ilmerge_params% /out:%outdir%\merged.dll %assemblies%
+%ilmerge% %ilmerge_params% /out:%package% %assemblies%
 if errorlevel 1 goto ilmerge_error
 goto ilmerge_ok
 
 :ilmerge_ok
-echo.
 pushd %outdir%
-del %assemblies%
+del /q %to_delete%
 popd
-ren %outdir%\merged.dll %package%
-echo The assemblies have been merged into "%outdir%\%package%".
+echo.
+echo The assemblies have been merged into "%package%".
 goto end
 
 :ilmerge_error
