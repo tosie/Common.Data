@@ -28,7 +28,7 @@
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.List = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ListToolStrip = new System.Windows.Forms.ToolStrip();
             this.btnAddRecord = new System.Windows.Forms.ToolStripButton();
             this.btnRemoveRecord = new System.Windows.Forms.ToolStripButton();
@@ -91,10 +91,10 @@
             this.List.TabIndex = 0;
             this.List.UseCompatibleStateImageBehavior = false;
             this.List.View = System.Windows.Forms.View.Details;
-            this.List.Resize += new System.EventHandler(this.List_Resize);
             this.List.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.List_AfterLabelEdit);
             this.List.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.List_ItemSelectionChanged);
             this.List.KeyDown += new System.Windows.Forms.KeyEventHandler(this.List_KeyDown);
+            this.List.Resize += new System.EventHandler(this.List_Resize);
             // 
             // columnHeader1
             // 
@@ -202,7 +202,7 @@
             this.cmsLinkLabels.ShowImageMargin = false;
             this.cmsLinkLabels.Size = new System.Drawing.Size(61, 4);
             // 
-            // DbRecordEditFormForm
+            // DbRecordEditForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -210,14 +210,14 @@
             this.Controls.Add(this.splitContainer);
             this.Controls.Add(this.lblText);
             this.KeyPreview = true;
-            this.Name = "DbRecordEditFormForm";
+            this.Name = "DbRecordEditForm";
             this.ShowIcon = false;
             this.ShowInTaskbar = false;
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "<Title>";
-            this.Load += new System.EventHandler(this.ScenarioForm_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DbRecordEditFormForm_FormClosing);
+            this.Load += new System.EventHandler(this.ScenarioForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DbRecordEditFormForm_KeyDown);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
@@ -232,17 +232,18 @@
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainer;
-        private System.Windows.Forms.ListView List;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ToolStrip ListToolStrip;
-        private System.Windows.Forms.ToolStripButton btnAddRecord;
-        private System.Windows.Forms.ToolStripButton btnRemoveRecord;
-        private System.Windows.Forms.ToolStripDropDownButton btnRecordAdvanced;
-        private System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
-        private System.Windows.Forms.Label lblText;
-        private System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
-        private System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
-        private Common.Configuration.ConfigurationControl ConfigControl;
+        protected System.Windows.Forms.SplitContainer splitContainer;
+        protected System.Windows.Forms.ListView List;
+        protected System.Windows.Forms.ColumnHeader columnHeader1;
+        protected System.Windows.Forms.ToolStrip ListToolStrip;
+        protected System.Windows.Forms.ToolStripButton btnAddRecord;
+        protected System.Windows.Forms.ToolStripButton btnRemoveRecord;
+        protected System.Windows.Forms.ToolStripDropDownButton btnRecordAdvanced;
+        protected System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
+        protected System.Windows.Forms.Label lblText;
+        protected System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
+        protected System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
+        protected Configuration.ConfigurationControl ConfigControl;
+
     }
 }
