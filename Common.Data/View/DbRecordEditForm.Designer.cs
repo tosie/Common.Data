@@ -1,5 +1,5 @@
 ﻿namespace Common.Data {
-    partial class DbRecordEditFormForm {
+    partial class DbRecordEditForm {
         /// <summary>
         /// Required designer variable.
         /// </summary>

@@ -12,7 +12,7 @@ using System.Reflection;
 using System.Collections;
 
 namespace Common.Data {
-    public partial class DbRecordEditFormForm : Form {
+    public partial class DbRecordEditForm : Form {
 
         #region Properties / Class Variables
 
@@ -72,7 +72,7 @@ namespace Common.Data {
 
         #region Constructors / Initialization
 
-        public DbRecordEditFormForm() {
+        public DbRecordEditForm() {
             InitializeComponent();
             ListToolStrip.Renderer = new NoBorderToolStripRenderer();
 
@@ -114,7 +114,7 @@ namespace Common.Data {
                 Records = new List<IEditableDbRecord>();
             }
 
-            using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
+            using (DbRecordEditForm form = new DbRecordEditForm()) {
                 // Important for FormData.LoadFormData and FormData.SaveFormData
                 form.Name = Name;
                 form.Text = Title;
@@ -140,7 +140,7 @@ namespace Common.Data {
         /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
         public static void EditRecords(IWin32Window Owner, String Name, String Title,
                 Type RecordType, List<IEditableDbRecord> Records) {
-            using (DbRecordEditFormForm form = new DbRecordEditFormForm()) {
+            using (DbRecordEditForm form = new DbRecordEditForm()) {
                 // Important for FormData.LoadFormData and FormData.SaveFormData
                 form.Name = Name;
                 form.Text = Title;

@@ -106,7 +106,7 @@ namespace Common.Data.Test
         [TestMethod()]
         [Ignore]
         public void EditRecordsTest() {
-            DbRecordEditFormForm.EditRecords(
+            DbRecordEditForm.EditRecords(
                 null,
                 "Test",
                 typeof(DummyModelHasMany));
