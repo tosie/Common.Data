@@ -46,6 +46,9 @@ namespace Common.Data {
             if (repository == null)
                 repository = Repository;
 
+            if (repository == null)
+                throw new ArgumentNullException("Repository", "No repository has been set.");
+
             // It is not possible to get the IDataProvider of a SimpleRepository
             // without the use of reflection, since the corresponding field
             // in the SimpleRepository class is non-public

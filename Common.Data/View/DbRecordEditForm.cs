@@ -200,6 +200,8 @@ namespace Common.Data {
             result.Name = SuggestedName;
             result.Update();
 
+            Records.Add(result);
+
             return result;
         }
 
@@ -225,6 +227,8 @@ namespace Common.Data {
             do {
                 counter++;
                 current_name = String.Format(template_more, counter);
+
+                Trace.Assert(counter < Int32.MaxValue, "The counter is too high.");
             } while (RecordNameAlreadyExists(current_name));
 
             return current_name;
