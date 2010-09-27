@@ -338,25 +338,29 @@ namespace Common.Data {
         /// <typeparam name="T"></typeparam>
         /// <param name="Records"></param>
         /// <returns></returns>
-        public static bool Delete<T>(List<T> Records) where T : DbRecord, IDbRecord, new() {
+        public static bool Delete<T>(IList<T> Records) where T : DbRecord, IDbRecord, new() {
             if (Records == null)
                 return true;
 
             // Event handler
-            bool can_delete = true;
-            Records.ForEach(r => can_delete = can_delete && r.BeforeDelete());
-
+            // TODO: Add transaction support?
+            bool can_delete = Records.All(r => r.BeforeDelete());
+            
             if (!can_delete)
                 return false;
 
             // Group by OwningRepository
             var by_repository = new Dictionary<SimpleRepository, List<T>>();
-            Records.ForEach(r => {
+
+            var count = Records.Count;
+            for (int i = 0; i < count; i++) {
+                var r = Records[i];
+
                 if (!by_repository.ContainsKey(r.OwningRepository))
                     by_repository[r.OwningRepository] = new List<T>();
 
                 by_repository[r.OwningRepository].Add(r);
-            });
+            }
 
             // Delete from cache and database
             foreach (var repository in by_repository.Keys) {
