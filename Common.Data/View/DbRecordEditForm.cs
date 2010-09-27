@@ -189,7 +189,7 @@ namespace Common.Data {
 
         #endregion
 
-        #region Record Creation / Duplication
+        #region Record Creation / Duplication / Deletion
 
         protected virtual IEditableDbRecord CreateNewRecord(String SuggestedName) {
             if (createRecord == null)
@@ -203,6 +203,13 @@ namespace Common.Data {
             Records.Add(result);
 
             return result;
+        }
+
+        protected virtual void DeleteRecord(IEditableDbRecord Record) {
+            if (!Record.Delete())
+                return;
+
+            Records.Remove(Record);
         }
 
         Boolean RecordNameAlreadyExists(String Name) {
@@ -326,11 +333,9 @@ namespace Common.Data {
             if (SelectedRecord == null)
                 return;
 
+            DeleteRecord(SelectedRecord);
+
             Int32 selected = List.SelectedItems[0].Index;
-
-            if (!SelectedRecord.Delete())
-                return;
-
             List.SelectedItems[0].Remove();
 
             if (List.Items.Count > selected)
