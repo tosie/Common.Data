@@ -13,7 +13,14 @@ namespace Common.Data {
 
         #region Properties / Class Variables
 
+        /// <summary>
+        /// Contains data after it has been loaded. Used by <see cref="Data"/>. Do not use anywhere else!
+        /// </summary>
         protected List<T> RealData;
+
+        /// <summary>
+        /// Property that acts as a proxy to the underlying data as it is stored in <see cref="RealData"/>.
+        /// </summary>
         protected List<T> Data {
             get {
                 if (RealBinaryData != null || RealData == null) {
@@ -30,6 +37,7 @@ namespace Common.Data {
         }
 
         protected byte[] RealBinaryData;
+
         public byte[] BinaryData {
             get {
                 // TODO: Maybe use RealData here, but what happens if the
@@ -138,6 +146,18 @@ namespace Common.Data {
 
         public void Sort(int index, int count, IComparer<T> comparer) {
             Data.Sort(index, count, comparer);
+        }
+
+        #endregion
+
+        #region List Members
+
+        /// <summary>
+        /// Performs the specified action on each element of the System.Collections.Generic.List<T>.
+        /// </summary>
+        /// <param name="action">The System.Action<T> delegate to perform on each element of the System.Collections.Generic.List<T>.</param>
+        public void ForEach(Action<T> action) {
+            Data.ForEach(action);
         }
 
         #endregion

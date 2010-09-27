@@ -68,6 +68,11 @@ namespace Common.Data {
 
         protected Boolean LoadingRecord { get; set; }
 
+        public String HeaderText {
+            get { return lblText.Text; }
+            set { lblText.Text = value; }
+        }
+
         #endregion
 
         #region Constructors / Initialization
@@ -186,7 +191,7 @@ namespace Common.Data {
 
         #region Record Creation / Duplication
 
-        protected IEditableDbRecord CreateNewRecord(String SuggestedName) {
+        protected virtual IEditableDbRecord CreateNewRecord(String SuggestedName) {
             if (createRecord == null)
                 return null;
 
