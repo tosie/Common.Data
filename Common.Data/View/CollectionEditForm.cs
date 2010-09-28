@@ -39,12 +39,12 @@ namespace Common.Data {
             public Int32 InitialWidth { get; set; }
 
             /// <summary>
-            /// Reference to the property info that corresponds to the <see cref="PropertyName"/> of the <see cref="HasManyType"/> of the <see cref="SelectedRecord"/>. Set by <see cref="SetupColumns"/>.
+            /// Reference to the property info that corresponds to the <see cref="PropertyName"/> of the <see cref="KeyType"/> of the <see cref="SelectedRecord"/>. Set by <see cref="SetupColumns"/>.
             /// </summary>
             public PropertyInfo Property { get; set; }
 
             /// <summary>
-            /// Reference to the "&lt;PropertyName&gt;Editor" method of the <see cref="HasManyType"/> of the <see cref="SelectedRecord"/>. Set by <see cref="SetupColumns"/>.
+            /// Reference to the "&lt;PropertyName&gt;Editor" method of the <see cref="KeyType"/> of the <see cref="SelectedRecord"/>. Set by <see cref="SetupColumns"/>.
             /// </summary>
             public MethodInfo FormatValueMethod { get; set; }
 
@@ -241,16 +241,41 @@ namespace Common.Data {
         protected PropertyInfo Property { get; set; }
 
         /// <summary>
-        /// If the type of the property is HasMany&lt;T&gt;, this
-        /// contains the type of T.
+        /// If the type of the property is HasMany&lt;T&gt;, this contains the type of T.
+        /// If the property is an Association&ltTKey, TValue&gt;, this contains the type of TKey.
         /// </summary>
         /// <see cref="InitializePropertyReflection"/>
-        protected Type HasManyType { get; set; }
+        protected Type KeyType { get; set; }
 
         /// <summary>
-        /// Holds all records associated with the <see cref="SelectedRecord"/> via the <see cref="PropertyName"/>.
+        /// If the type of the property is HasMany&lt;T&gt;, this is null.
+        /// If the property is an Association&lt;TKey, TValue&gt;, this contains the type of TValue.
         /// </summary>
-        public List<DbRecord> SelectedRecords { get; protected set; }
+        /// <see cref="InitializePropertyReflection"/>
+        protected Type ValueType { get; set; }
+
+        /// <summary>
+        /// Holds all records associated with the <see cref="SelectedRecord"/> via the <see cref="PropertyName"/>, if the property name corresponds with a HasMany&gt;T&lt; collection.
+        /// </summary>
+        public List<DbRecord> SelectedRecordsList { get; protected set; }
+
+        /// <summary>
+        /// Holds all records associated with the <see cref="SelectedRecord"/> via the <see cref="PropertyName"/>, if the property name corresponds with an Association&gt;TKey, TValue&lt; collection.
+        /// </summary>
+        public Dictionary<DbRecord, DbRecord> SelectedRecordsDict { get; protected set; }
+
+        /// <summary>
+        /// Determines whether the elements in the right list view can be rearranged by user interaction.
+        /// </summary>
+        public Boolean AllowReordering {
+            get {
+                return SelectedList.AllowDrop;
+            }
+
+            set {
+                SelectedList.AllowDrop = value;
+            }
+        }
 
         #endregion
 
@@ -397,6 +422,11 @@ namespace Common.Data {
 
         #region GUI Support
 
+        /// <summary>
+        /// Adds the given record the the left list view.
+        /// </summary>
+        /// <param name="Record"></param>
+        /// <returns></returns>
         ListViewItem AddRecordToListView(IEditableDbRecord Record) {
             ListViewItem item = new ListViewItem();
 
@@ -443,15 +473,16 @@ namespace Common.Data {
         /// </summary>
         protected void ResetProperties() {
             Property = null;
-            HasManyType = null;
-            SelectedRecords = new List<DbRecord>();
+            KeyType = null;
+            SelectedRecordsList = null;
+            SelectedRecordsDict = null;
         }
 
         /// <summary>
-        /// Makes some property and type checking and initializes +property+ and +hasManyType+.
+        /// Makes some property and type checking and initializes <see cref="Property"/> and <see cref="KeyType"/>.
         /// </summary>
-        /// <exception cref="System.ArgumentNullException">Thrown when SelectedRecord or PropertyName are not set.</exception>
-        /// <exception cref="System.ArgumentException">Thrown when the property defined by PropertyName is not found or does not correspond to the HasMany&lt;T&gt; type.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown when <see cref="SelectedRecord"/> or <see cref="PropertyName"/> are not set.</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the property defined by <see cref="PropertyName"/> is not found or does not correspond to either the Association&lt;TKey, TValue&gt or the HasMany&lt;T&gt; type.</exception>
         protected void InitializePropertyReflection() {
             if (SelectedRecord == null)
                 throw new ArgumentNullException("SelectedRecord", "SelectedRecord must be set.");
@@ -464,13 +495,15 @@ namespace Common.Data {
                 throw new ArgumentException(String.Format("Could not find a property by the name of \"{0}\".", PropertyName), "PropertyName");
 
             string compiled_name = Property.PropertyType.Namespace + "." + Property.PropertyType.Name;
-            if (compiled_name != "Common.Data.HasMany`1")
-                throw new ArgumentException("The given property does not represent a HasMany<T> type.", "PropertyName");
+            if (compiled_name != "Common.Data.Association`2" && compiled_name != "Common.Data.HasMany`1")
+                throw new ArgumentException("The given property does not represent either the Association<TKey, TValue> or the HasMany<T> type.", "PropertyName");
 
             Type[] arguments = Property.PropertyType.GetGenericArguments();
-            Trace.Assert(arguments.Length == 1);
+            Trace.Assert((compiled_name == "Common.Data.Association`2" && arguments.Length == 2)
+                || (compiled_name == "Common.Data.HasMany`1" && arguments.Length == 1));
 
-            HasManyType = arguments[0];
+            KeyType = arguments[0];
+            ValueType = arguments.Length > 1 ? arguments[1] : null;
         }
 
         /// <summary>
@@ -478,13 +511,13 @@ namespace Common.Data {
         /// </summary>
         /// <param name="Columns">The column definitions to use.</param>
         /// <param name="List">The list view to apply the column definitions too.</param>
-        /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="List"/> or <see cref="HasManyType"/> are null.</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="List"/> or <see cref="KeyType"/> are null. Also thrown when <see cref="ValueType"/> is null and it is used.</exception>
         protected void SetupColumns(ColumnDefinition[] Columns, ListView List) {
             if (List == null)
                 throw new ArgumentNullException("List");
 
-            if (HasManyType == null)
-                throw new ArgumentNullException("HasManyType");
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
 
             List.BeginUpdate();
 
@@ -494,7 +527,7 @@ namespace Common.Data {
 
                 if (Columns == null || Columns.Length <= 0) {
                     Columns = new ColumnDefinition[] {
-                        new ColumnDefinition("Name", "Name", 250)
+                        new ColumnDefinition("Key.Name", "Name", 250)
                     };
                 }
 
@@ -503,15 +536,32 @@ namespace Common.Data {
                     
                     List.Columns.Add(column.HeaderText, column.InitialWidth);
 
+                    string property_name = column.PropertyName;
+                    Type record_type = KeyType;
+
+                    if (property_name.StartsWith("Key.")) {
+                        property_name = property_name.Remove(0, "Key.".Length);
+                    } else if (property_name.StartsWith("Value.")) {
+                        if (ValueType == null)
+                            throw new ArgumentNullException("ValueType");
+
+                        property_name = property_name.Remove(0, "Value.".Length);
+                        record_type = ValueType;
+                    } else {
+                        // Handle it just like the "Key." case above.
+                    }
+
+                    
+
                     try {
-                        column.Property = HasManyType.GetProperty(column.PropertyName);
+                        column.Property = record_type.GetProperty(property_name);
                     } catch {
                         column.Property = null;
                     }
 
-                    string method_name = column.PropertyName + "Editor";
+                    string method_name = property_name + "Editor";
                     try {
-                        column.FormatValueMethod = HasManyType.GetMethod(method_name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+                        column.FormatValueMethod = record_type.GetMethod(method_name, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
                     } catch {
                         column.FormatValueMethod = null;
                     }
@@ -554,21 +604,19 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="SelectedRecords"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecords"/> property.
+        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="SelectedRecordsList"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecordsList"/> property.
         /// </summary>
-        /// <exception cref="System.ArgumentNullException">Thrown when SelectedRecords, Property or HasManyType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
-        /// <exception cref="System.MemberAccessException">Thrown when the HasManyType does not contain
-        /// a static method named "Read".</exception>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property or KeyType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when the KeyType does not contain a static method named "Read".</exception>
         /// <exception cref="System.InvalidCastException">Thrown when the list of items contained in the HasMany set (see <see cref="SelectedRecord"/> and <see cref="PropertyName"/>) contains elements that cannot be cast to the DbRecord class.</exception>
-        protected void ReadSelectedRecords() {
-            if (SelectedRecords == null)
-                throw new ArgumentNullException("SelectedRecords");
-
+        protected void ReadSelectedRecordsList() {
             if (Property == null)
                 throw new ArgumentNullException("Property");
 
-            if (HasManyType == null)
-                throw new ArgumentNullException("HasManyType");
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            SelectedRecordsList = new List<DbRecord>();
 
             // Invoke the property's get method
             object list = null;
@@ -581,7 +629,66 @@ namespace Common.Data {
             if (list == null)
                 return;
 
-            AnonymousObjectToDbRecordList(list, SelectedRecords);
+            AnonymousObjectToDbRecordList(list, SelectedRecordsList);
+        }
+
+        /// <summary>
+        /// Converts an anonymous object that implements the IDictionary interface to a dictionary of DbRecords.
+        /// </summary>
+        /// <param name="Obj">The anonymous object</param>
+        /// <param name="Dictionary">The dictionary to which to add the items</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the passed object does not implement the IDictionary interface.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items passed as anonymous object contains elements that cannot be cast to the DbRecord class.</exception>
+        protected void AnonymousObjectToDbRecordDict(object Obj, Dictionary<DbRecord, DbRecord> Dictionary) {
+            if (Obj == null)
+                throw new ArgumentNullException("Obj");
+
+            if (Dictionary == null)
+                throw new ArgumentNullException("Dictionary");
+
+            if (!(Obj is IDictionary))
+                throw new ArgumentException("The given object is not of an IDictionary type.", "Obj");
+
+            int count = ((IDictionary)Obj).Count;
+
+            Dictionary.Clear();
+
+            foreach (var key in ((IDictionary)Obj).Keys) {
+                Dictionary[key as DbRecord] = ((IDictionary)Obj)[key] as DbRecord;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="SelectedRecordsList"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecordsList"/> property.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property, KeyType or ValueType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when neither the KeyType nor the ValueType contain a static method named "Read".</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items contained in the Association set (see <see cref="SelectedRecord"/> and <see cref="PropertyName"/>) contains elements that cannot be cast to the DbRecord class.</exception>
+        protected void ReadSelectedRecordsDict() {
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            if (ValueType == null)
+                throw new ArgumentNullException("ValueType");
+
+            SelectedRecordsDict = new Dictionary<DbRecord, DbRecord>();
+
+            // Invoke the property's get method
+            object dict = null;
+            try {
+                dict = Property.GetValue(SelectedRecord, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the Association set.", ex);
+            }
+
+            if (dict == null)
+                return;
+
+            AnonymousObjectToDbRecordDict(dict, SelectedRecordsDict);
         }
 
         /// <summary>
@@ -605,6 +712,46 @@ namespace Common.Data {
                 ColumnDefinition column = Columns[i];
 
                 string text = column.GetFormattedValue(Record);
+
+                if (i == 0)
+                    item.Text = text;
+                else
+                    item.SubItems.Add(text);
+            }
+
+            item.Tag = Record;
+
+            return List.Items.Add(item);
+        }
+
+        /// <summary>
+        /// Adds a specific record to the given list view.
+        /// </summary>
+        /// <param name="Record">The KeyValuePair of two records to be added to the list view.</param>
+        /// <param name="List">The list view to add the record to.</param>
+        /// <returns>The newly created list view item.</returns>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected ListViewItem AddRecordToListView(KeyValuePair<DbRecord, DbRecord> Record, ListView List) {
+            if (Record.Key == null)
+                throw new ArgumentNullException("Record.Key");
+
+            if (Record.Value == null)
+                throw new ArgumentNullException("Record.Value");
+
+            if (List == null)
+                throw new ArgumentNullException("List");
+
+            ListViewItem item = new ListViewItem();
+
+            // Use the column definition to set up the text to be shown
+            for (int i = 0; i < Columns.Length; i++) {
+                ColumnDefinition column = Columns[i];
+
+                string text = "";
+                if (column.PropertyName.StartsWith("Value."))
+                    text = column.GetFormattedValue(Record.Value);
+                else
+                    text = column.GetFormattedValue(Record.Key);
 
                 if (i == 0)
                     item.Text = text;
@@ -642,14 +789,39 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Adds all <see cref="SelectedRecords"/> to the right list view.
+        /// Adds all records passed to the given list view.
         /// </summary>
-        /// <exception cref="System.ArgumentNullException">Thrown when <see cref="SelectedRecords"/> is null.</exception>
-        protected void AddRecordsToListViews() {
-            if (SelectedRecords == null)
-                throw new ArgumentNullException("SelectedRecords");
+        /// <param name="Records">Dictionary of DbRecords to be added to the list view.</param>
+        /// <param name="List">The list view to add the records to.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected void AddRecordsToListView(Dictionary<DbRecord, DbRecord> Records, ListView List) {
+            if (Records == null)
+                throw new ArgumentNullException("Records");
 
-            AddRecordsToListView(SelectedRecords, SelectedList);
+            if (List == null)
+                throw new ArgumentNullException("List");
+
+            List.BeginUpdate();
+
+            try {
+                foreach (KeyValuePair<DbRecord, DbRecord> kv in Records) {
+                    AddRecordToListView(kv, List);
+                }
+            } finally {
+                List.EndUpdate();
+            }
+        }
+
+        /// <summary>
+        /// Adds all <see cref="SelectedRecordsList"/> to the right list view.
+        /// </summary>
+        protected void AddRecordsToListViews() {
+            if (SelectedRecordsList != null)
+                AddRecordsToListView(SelectedRecordsList, SelectedList);
+            else if (SelectedRecordsDict != null)
+                AddRecordsToListView(SelectedRecordsDict, SelectedList);
+            else
+                Trace.Assert(false, "Do not know what records to add to the list views.");
         }
 
         /// <summary>
@@ -696,7 +868,10 @@ namespace Common.Data {
 
                 try {
                     // Get a list of all records that are already selected = (selected).
-                    ReadSelectedRecords();
+                    if (ValueType == null)
+                        ReadSelectedRecordsList();
+                    else
+                        ReadSelectedRecordsDict();
 
                     // Show (selected) and (available).
                     AddRecordsToListViews();
@@ -704,66 +879,6 @@ namespace Common.Data {
 
             } finally {
                 SelectedList.EndUpdate();
-            }
-        }
-
-        /// <summary>
-        /// Synchronizes the items from the right list view back to the property <see cref="SelectedRecords"/> and <see cref="UnselectedRecords"/> as well as the <see cref="SelectedRecord"/>. Afterwards the record is saved to the database.
-        /// </summary>
-        /// <exception cref="System.ArgumentNullException">Thrown when one of <see cref="SelectedRecords"/>, <see cref="Property"/> or <see cref="HasManyType"/> is null.</exception>
-        /// <exception cref="System.MemberAccessException">Thrown when the property of the owning record could not be read.</exception>
-        /// <exception cref="System.MethodAccessException">Thrown when the update method of the owning record could not be found or called.</exception>
-        protected void UpdateSelectedRecord() {
-            if (SelectedRecords == null)
-                throw new ArgumentNullException("SelectedRecords");
-
-            if (Property == null)
-                throw new ArgumentNullException("Property");
-
-            if (HasManyType == null)
-                throw new ArgumentNullException("HasManyType");
-
-            // Update the lists containing the selected and unselected records
-            SelectedRecords.Clear();
-            foreach (ListViewItem item in SelectedList.Items) {
-                SelectedRecords.Add((DbRecord)item.Tag);
-            }
-
-            // Invoke the property's get method
-            object list = null;
-            try {
-                list = Property.GetValue(SelectedRecord, null);
-            } catch (Exception ex) {
-                throw new MemberAccessException("Could not get the HasMany set.", ex);
-            }
-
-            if (list == null)
-                return;
-
-            // Transfer the selected items
-            ((IList)list).Clear();
-            SelectedRecords.ForEach(r => ((IList)list).Add(r));
-
-            // Store everything
-            // Bind to the read method
-            MethodInfo update = null;
-            try {
-                update = SelectedRecord.GetType().GetMethod(
-                    "Update",
-                    BindingFlags.Public | BindingFlags.Instance,
-                    null,
-                    new Type[] { },
-                    null);
-            } catch { }
-
-            if (update == null)
-                throw new MethodAccessException("Could not find the Update method.");
-
-            // Invoke the update method
-            try {
-                update.Invoke(SelectedRecord, null);
-            } catch (Exception ex) {
-                throw new MethodAccessException("Could not invoke the Update method.", ex);
             }
         }
 
@@ -861,7 +976,7 @@ namespace Common.Data {
 
                 switch ((String)item.Tag) {
                     case "SelectedRecord != null":
-                        // Enable if a Scenario is selected
+                        // Enable if something in the left list view is selected
                         item.Enabled = record_selected;
                         break;
                     default:
@@ -882,16 +997,16 @@ namespace Common.Data {
         }
 
         private void smiDuplicateRecord_Click(object sender, EventArgs e) {
-            // Basisinstanz merken
+            // Remember the base instance
             IEditableDbRecord template = SelectedRecord;
 
-            // Neue Instanz erstellen
+            // Create a new instance
             IEditableDbRecord duplicate = template.Duplicate();
             duplicate.Name = FindNewNameForRecord(template.Name);
             duplicate.Update();
             Records.Add(duplicate);
 
-            // In ListView anzeigen
+            // Add the new instance to the list view
             ListViewItem new_item = AddRecordToListView(duplicate);
             SelectRecord(new_item, true, true);
         }

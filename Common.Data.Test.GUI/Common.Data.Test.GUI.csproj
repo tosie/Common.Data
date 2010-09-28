@@ -52,7 +52,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssocKey.cs" />
+    <Compile Include="AssocValue.cs" />
     <Compile Include="Author.cs" />
+    <Compile Include="Book.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
