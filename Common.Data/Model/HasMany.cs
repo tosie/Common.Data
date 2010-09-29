@@ -161,6 +161,14 @@ namespace Common.Data {
             Data.ForEach(action);
         }
 
+        /// <summary>
+        /// Adds the elements of the specified collection to the end of the HasMany&lt;T&gt; collection.
+        /// </summary>
+        /// <param name="collection">The collections whose elements should be added to the end of the HasMany&lt;T&gt; collection. The collection itself cannot be null, but it can contain elements that are null, if T is a reference type.</param>
+        public void AddRange(IEnumerable<T> collection) {
+            Data.AddRange(collection);
+        }
+
         #endregion
 
         #region IList<T> Members
