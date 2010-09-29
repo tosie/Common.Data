@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Common.Configuration</name>
+    </assembly>
+    <members>
+        <member name="T:Common.Configuration.Profiler">
+            <summary>
+            The profiler class helps in profiling code sections. It outputs the time required to code completion and memory used before and afterwads.
+            </summary>
+            <example>
+            using (new Profiler()) {
+              // TODO: Add code here
+            }
+            </example>
+        </member>
+        <member name="P:Common.Configuration.Profiler.InvokeGarbageCollector">
+            <summary>
+            If true, <see cref="M:System.GC.Collect(System.Int32)"/> is called right before the profiling ends.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.Profiler.Watch">
+            <summary>
+            A reference to the stopwatch being used to calculate the execution time.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.Profiler.Duration">
+            <summary>
+            Shortcut to <see cref="!:Watch.Elapsed"/>. Returns TimeSpan.MinValue, if the watch has not been initialized, yet.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.Profiler.MemAtBeginning">
+            <summary>
+            Holds the amount of memory being used by the application at the beginning of the profiling.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.Profiler.MemAtEnd">
+            <summary>
+            Holds the amount of memory being used by the application at the end of the profiling.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.Profiler.MemUsage">
+            <summary>
+            Difference of <see cref="P:Common.Configuration.Profiler.MemAtEnd"/> and <see cref="P:Common.Configuration.Profiler.MemAtBeginning"/>.
+            </summary>
+        </member>
+        <member name="E:Common.Configuration.Profiler.Output">
+            <summary>
+            This event is raised at the end of the profiling and contains the profiling summary. If no event handler is specified, the output goes to the debugger (if available).
+            </summary>
+        </member>
+        <member name="T:Common.Configuration.Profiler.WriteDelegate">
+            <summary>
+            Function signature to use when receiving the profiling summary (<seealso cref="E:Common.Configuration.Profiler.Output"/>).
+            </summary>
+            <param name="Text">A string containing the profiling summary.</param>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.GetDirectType(System.Object)">
+            <summary>
+            Returns the type of the object. If the type is of a Castle.Proxies type, the base type is returned.
+            </summary>
+            <param name="obj"></param>
+            <returns></returns>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationControl.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationControl.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationControl.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationForm.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationForm.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationForm.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="F:Common.Configuration.FileSystemBrowser.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.FileSystemBrowser.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Common.Configuration.FileSystemBrowser.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="F:Common.Configuration.LabelSlider.components">
+            <summary> 
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.LabelSlider.Dispose(System.Boolean)">
+            <summary> 
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:Common.Configuration.LabelSlider.InitializeComponent">
+            <summary> 
+            Required method for Designer support - do not modify 
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+    </members>
+</doc>

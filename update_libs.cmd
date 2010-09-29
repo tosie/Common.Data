@@ -10,6 +10,9 @@ if not exist %libdir% mkdir %libdir%
 copy /Y ..\Common.Configuration\Release\*.dll %libdir%
 if errorlevel 1 goto update_error
 
+copy /Y ..\Common.Configuration\Release\*.xml %libdir%
+if errorlevel 1 goto update_error
+
 goto update_ok
 
 :update_ok
