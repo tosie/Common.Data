@@ -24,13 +24,13 @@
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            System.Windows.Forms.ListViewItem listViewItem9 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem10 = new System.Windows.Forms.ListViewItem("Item 2");
-            System.Windows.Forms.ListViewItem listViewItem11 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem12 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
+            System.Windows.Forms.ListViewItem listViewItem3 = new System.Windows.Forms.ListViewItem("Item 1");
+            System.Windows.Forms.ListViewItem listViewItem4 = new System.Windows.Forms.ListViewItem("Item 2");
             this.splitContainer = new System.Windows.Forms.SplitContainer();
             this.List = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.ListToolStrip = new System.Windows.Forms.ToolStrip();
             this.btnAddRecord = new System.Windows.Forms.ToolStripButton();
             this.btnRemoveRecord = new System.Windows.Forms.ToolStripButton();
@@ -42,7 +42,7 @@
             this.btnSelectedRemoveRecord = new System.Windows.Forms.ToolStripButton();
             this.btnSelectedAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
             this.SelectedList = new Common.Data.FasterListView();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblText = new System.Windows.Forms.Label();
             this.cmsLinkLabels = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.splitContainer.Panel1.SuspendLayout();
@@ -88,8 +88,8 @@
             this.List.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
             this.List.HideSelection = false;
             this.List.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem9,
-            listViewItem10});
+            listViewItem1,
+            listViewItem2});
             this.List.LabelEdit = true;
             this.List.LabelWrap = false;
             this.List.Location = new System.Drawing.Point(6, 6);
@@ -100,10 +100,10 @@
             this.List.TabIndex = 0;
             this.List.UseCompatibleStateImageBehavior = false;
             this.List.View = System.Windows.Forms.View.Details;
-            this.List.Resize += new System.EventHandler(this.List_Resize);
             this.List.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.List_AfterLabelEdit);
             this.List.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.List_ItemSelectionChanged);
             this.List.KeyDown += new System.Windows.Forms.KeyEventHandler(this.List_KeyDown);
+            this.List.Resize += new System.EventHandler(this.List_Resize);
             // 
             // columnHeader1
             // 
@@ -244,8 +244,8 @@
             this.SelectedList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.SelectedList.HideSelection = false;
             this.SelectedList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem11,
-            listViewItem12});
+            listViewItem3,
+            listViewItem4});
             this.SelectedList.LabelWrap = false;
             this.SelectedList.Location = new System.Drawing.Point(6, 6);
             this.SelectedList.Name = "SelectedList";
@@ -253,10 +253,11 @@
             this.SelectedList.TabIndex = 2;
             this.SelectedList.UseCompatibleStateImageBehavior = false;
             this.SelectedList.View = System.Windows.Forms.View.Details;
+            this.SelectedList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.SelectedList_ItemDrag);
             this.SelectedList.DragDrop += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragDrop);
             this.SelectedList.DragEnter += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragEnter);
             this.SelectedList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SelectedList_KeyDown);
-            this.SelectedList.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.SelectedList_ItemDrag);
+            this.SelectedList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SelectedList_MouseClick);
             // 
             // columnHeader2
             // 
@@ -294,8 +295,8 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "<Title>";
-            this.Load += new System.EventHandler(this.ScenarioForm_Load);
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.CollectionEditForm_FormClosing);
+            this.Load += new System.EventHandler(this.ScenarioForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.CollectionEditForm_KeyDown);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
@@ -313,22 +314,23 @@
 
         #endregion
 
-        private System.Windows.Forms.SplitContainer splitContainer;
-        private System.Windows.Forms.ListView List;
-        private System.Windows.Forms.ColumnHeader columnHeader1;
-        private System.Windows.Forms.ToolStrip ListToolStrip;
-        private System.Windows.Forms.ToolStripButton btnAddRecord;
-        private System.Windows.Forms.ToolStripButton btnRemoveRecord;
-        private System.Windows.Forms.ToolStripDropDownButton btnAdvanced;
-        private System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
-        private System.Windows.Forms.Label lblText;
-        private System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
-        private System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
-        private Common.Data.FasterListView SelectedList;
-        private System.Windows.Forms.ColumnHeader columnHeader2;
-        private System.Windows.Forms.ToolStrip SelectedListToolStrip;
-        private System.Windows.Forms.ToolStripButton btnSelectedAddRecord;
-        private System.Windows.Forms.ToolStripButton btnSelectedRemoveRecord;
-        private System.Windows.Forms.ToolStripDropDownButton btnSelectedAdvanced;
+        protected System.Windows.Forms.SplitContainer splitContainer;
+        protected System.Windows.Forms.ListView List;
+        protected System.Windows.Forms.ColumnHeader columnHeader1;
+        protected System.Windows.Forms.ToolStrip ListToolStrip;
+        protected System.Windows.Forms.ToolStripButton btnAddRecord;
+        protected System.Windows.Forms.ToolStripButton btnRemoveRecord;
+        protected System.Windows.Forms.ToolStripDropDownButton btnAdvanced;
+        protected System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
+        protected System.Windows.Forms.Label lblText;
+        protected System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
+        protected System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
+        protected FasterListView SelectedList;
+        protected System.Windows.Forms.ColumnHeader columnHeader2;
+        protected System.Windows.Forms.ToolStrip SelectedListToolStrip;
+        protected System.Windows.Forms.ToolStripButton btnSelectedAddRecord;
+        protected System.Windows.Forms.ToolStripButton btnSelectedRemoveRecord;
+        protected System.Windows.Forms.ToolStripDropDownButton btnSelectedAdvanced;
+
     }
 }

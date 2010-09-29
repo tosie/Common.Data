@@ -6,8 +6,10 @@ using System.Collections;
 using System.IO.Compression;
 using System.IO;
 using System.Reflection;
+using System.Diagnostics;
 
 namespace Common.Data {
+    [DebuggerDisplay("Count = {Count}")]
     public class Association<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
         where TKey : DbRecord, IDbRecord, new()
         where TValue : DbRecord, IDbRecord, new() {
@@ -78,6 +80,9 @@ namespace Common.Data {
                 using (var s = new GZipStream(zipped, CompressionMode.Compress)) {
                     using (var sw = new StreamWriter(s)) {
                         foreach (KeyValuePair<TKey, TValue> kv in data) {
+                            if (kv.Key == null || kv.Value == null)
+                                continue;
+
                             sw.Write(kv.Key.Id);
                             sw.Write("\t");
                             sw.Write(kv.Value.Id);

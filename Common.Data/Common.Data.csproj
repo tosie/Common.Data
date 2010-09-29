@@ -80,7 +80,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Association.cs" />
+    <Compile Include="Model\Association.cs" />
     <Compile Include="Controller\ListExtensions.cs" />
     <Compile Include="Interfaces\IDbRecord.cs" />
     <Compile Include="Interfaces\IEditableDbRecord.cs" />

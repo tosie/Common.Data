@@ -9,6 +9,7 @@ using System.Collections;
 using System.Diagnostics;
 
 namespace Common.Data {
+    [DebuggerDisplay("Count = {Count}")]
     public class HasMany<T> : IList<T>, IList where T : DbRecord, IDbRecord, new() {
 
         #region Properties / Class Variables

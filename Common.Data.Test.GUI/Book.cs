@@ -21,6 +21,10 @@ namespace Common.Data.Test.GUI {
             return Book.Create<Book>();
         }
 
+        public static Book Create(Object Tag) {
+            return Book.Create<Book>(Tag);
+        }
+
         public static Book Read(Int64 Id) {
             return Book.Read<Book>(Id);
         }
@@ -42,7 +46,8 @@ namespace Common.Data.Test.GUI {
         #region IDbRecord Members
 
         public void InitializeWithDefaults(Object Tag) {
-            // TODO
+            if (Tag != null && Tag is String)
+                Name = Tag as String;
         }
 
         public void AfterLoad() {

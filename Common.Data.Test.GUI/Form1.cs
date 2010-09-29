@@ -14,6 +14,12 @@ namespace Common.Data.Test.GUI {
         }
 
         private void button1_Click(object sender, EventArgs e) {
+            var a = Author.Create();
+            a.Name = "Jackson";
+            a.Books.Add(Book.Create("Book 1"));
+            a.Books.Add(Book.Create("Book 2"));
+            a.Update();
+
             Author.ShowEditForm(this);
         }
 
