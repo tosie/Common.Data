@@ -309,6 +309,45 @@ namespace Common.Data {
         }
 
         /// <summary>
+        /// Method to update many records at once.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Records"></param>
+        public static void Update<T>(IList<T> Records) where T : DbRecord, IDbRecord, new() {
+            if (Records == null)
+                return;
+
+            if (Records.Count <= 0)
+                return;
+
+            // Event handler
+            // TODO: Add transaction support?
+            bool can_update = Records.All(r => r.BeforeUpdate());
+
+            if (!can_update)
+                return;
+
+            // Group by OwningRepository
+            var by_repository = new Dictionary<SimpleRepository, List<T>>();
+
+            var count = Records.Count;
+            for (int i = 0; i < count; i++) {
+                var r = Records[i];
+
+                if (!by_repository.ContainsKey(r.OwningRepository))
+                    by_repository[r.OwningRepository] = new List<T>();
+
+                by_repository[r.OwningRepository].Add(r);
+            }
+
+            // Update for each repository
+            foreach (var repository in by_repository.Keys) {
+                // Do the update
+                repository.UpdateMany<T>(by_repository[repository]);
+            }
+        }
+
+        /// <summary>
         /// Removes a record from the database.
         /// </summary>
         /// <typeparam name="T"></typeparam>
