@@ -394,6 +394,7 @@ namespace Common.Data {
                     continue;
 
                 SelectRecord(item, EnsureVisibility, EditAfterSelect);
+                break;
             }
         }
 
@@ -809,6 +810,61 @@ namespace Common.Data {
         }
 
         /// <summary>
+        /// Updates the list view item with the information provided by the record and according the the column definition.
+        /// </summary>
+        /// <param name="Record">The record to use.</param>
+        /// <param name="Item">The item to apply the information too.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected virtual void UpdateListViewItemForRecord(DbRecord Record, ListViewItem Item) {
+            if (Record == null)
+                throw new ArgumentNullException("Record");
+
+            if (Item == null)
+                throw new ArgumentNullException("Item");
+
+            // Use the column definition to set up the text to be shown
+            for (int i = 0; i < Columns.Length; i++) {
+                ColumnDefinition column = Columns[i];
+
+                string text = column.GetFormattedValue(Record);
+
+                if (i == 0) {
+                    Item.Text = text;
+                } else {
+                    // Item.Text counts towards Item.SubItems.Count, thus -1
+                    if (Item.SubItems.Count - 1 < i)
+                        Item.SubItems.Add(text);
+                    else
+                        Item.SubItems[i].Text = text;
+                }
+            }
+
+            Item.Tag = Record;
+        }
+
+        /// <summary>
+        /// Updates a single record in the right list view without the need to recreate the whole list view.
+        /// </summary>
+        /// <param name="Record">The record whose changes should be propagated to the list view.</param>
+        /// <param name="List">The list view where the record can be found in.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected virtual void UpdateRecordInListView(DbRecord Record, ListView List) {
+            if (Record == null)
+                throw new ArgumentNullException("Record");
+
+            if (List == null)
+                throw new ArgumentNullException("List");
+
+            foreach (ListViewItem item in List.Items) {
+                if ((IEditableDbRecord)item.Tag != Record)
+                    continue;
+
+                UpdateListViewItemForRecord(Record, item);
+                break;
+            }
+        }
+
+        /// <summary>
         /// Adds a specific record to the given list view.
         /// </summary>
         /// <param name="Record">The record to add to the list view.</param>
@@ -824,19 +880,7 @@ namespace Common.Data {
 
             ListViewItem item = new ListViewItem();
 
-            // Use the column definition to set up the text to be shown
-            for (int i = 0; i < Columns.Length; i++) {
-                ColumnDefinition column = Columns[i];
-
-                string text = column.GetFormattedValue(Record);
-
-                if (i == 0)
-                    item.Text = text;
-                else
-                    item.SubItems.Add(text);
-            }
-
-            item.Tag = Record;
+            UpdateListViewItemForRecord(Record, item);
 
             return List.Items.Add(item);
         }
@@ -863,6 +907,17 @@ namespace Common.Data {
             } finally {
                 List.EndUpdate();
             }
+        }
+
+        /// <summary>
+        /// Call this method whenever the value of a collection item has changed.
+        /// </summary>
+        /// <param name="Record">The collection item that has changed.</param>
+        public void RecordChanged(DbRecord Record) {
+            if (SelectedRecord == null)
+                return;
+
+            UpdateRecordInListView(Record, SelectedList);
         }
 
         #endregion
@@ -929,6 +984,66 @@ namespace Common.Data {
         }
 
         /// <summary>
+        /// Updates the list view item with the information provided by the record and according the the column definition.
+        /// </summary>
+        /// <param name="Record">The record to use.</param>
+        /// <param name="Item">The item to apply the information too.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected virtual void UpdateListViewItemForRecord(KeyValuePair<DbRecord, DbRecord> Record, ListViewItem Item) {
+            if (Record.Key == null)
+                throw new ArgumentNullException("Record.Key");
+
+            if (Item == null)
+                throw new ArgumentNullException("Item");
+
+            // Use the column definition to set up the text to be shown
+            for (int i = 0; i < Columns.Length; i++) {
+                ColumnDefinition column = Columns[i];
+
+                string text = "";
+                if (column.PropertyName.StartsWith("Value."))
+                    text = column.GetFormattedValue(Record.Value);
+                else
+                    text = column.GetFormattedValue(Record.Key);
+
+                if (i == 0) {
+                    Item.Text = text;
+                } else {
+                    // Item.Text counts towards Item.SubItems.Count, thus -1
+                    if (Item.SubItems.Count - 1 < i)
+                        Item.SubItems.Add(text);
+                    else
+                        Item.SubItems[i].Text = text;
+                }
+            }
+
+            Item.Tag = Record;
+        }
+
+        /// <summary>
+        /// Updates a single record in the right list view without the need to recreate the whole list view.
+        /// </summary>
+        /// <param name="Record">The record whose changes should be propagated to the list view.</param>
+        /// <param name="List">The list view where the record can be found in.</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        protected virtual void UpdateRecordInListView(KeyValuePair<DbRecord, DbRecord> Record, ListView List) {
+            if (Record.Key == null)
+                throw new ArgumentNullException("Record.Key");
+
+            if (List == null)
+                throw new ArgumentNullException("List");
+
+            foreach (ListViewItem item in List.Items) {
+                var item_record = (KeyValuePair<DbRecord, DbRecord>)item.Tag;
+                if (item_record.Key != Record.Key)
+                    continue;
+
+                UpdateListViewItemForRecord(Record, item);
+                break;
+            }
+        }
+
+        /// <summary>
         /// Adds a specific record to the given list view.
         /// </summary>
         /// <param name="Record">The KeyValuePair of two records to be added to the list view.</param>
@@ -944,23 +1059,7 @@ namespace Common.Data {
 
             ListViewItem item = new ListViewItem();
 
-            // Use the column definition to set up the text to be shown
-            for (int i = 0; i < Columns.Length; i++) {
-                ColumnDefinition column = Columns[i];
-
-                string text = "";
-                if (column.PropertyName.StartsWith("Value."))
-                    text = column.GetFormattedValue(Record.Value);
-                else
-                    text = column.GetFormattedValue(Record.Key);
-
-                if (i == 0)
-                    item.Text = text;
-                else
-                    item.SubItems.Add(text);
-            }
-
-            item.Tag = Record;
+            UpdateListViewItemForRecord(Record, item);
 
             return List.Items.Add(item);
         }
@@ -987,6 +1086,17 @@ namespace Common.Data {
             } finally {
                 List.EndUpdate();
             }
+        }
+
+        /// <summary>
+        /// Call this method whenever the value of an association has changed.
+        /// </summary>
+        /// <param name="Record">The association that has changed.</param>
+        public void RecordChanged(KeyValuePair<DbRecord, DbRecord> Record) {
+            if (SelectedRecord == null)
+                return;
+
+            UpdateRecordInListView(Record, SelectedList);
         }
 
         #endregion
