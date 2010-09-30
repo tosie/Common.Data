@@ -105,9 +105,10 @@ namespace Common.Data {
         /// Delegate to use when specifying a method that is responsible for initializing a drop down menu for the list view.
         /// </summary>
         /// <param name="Sender">Reference to the form that called this method.</param>
-        /// <param name="DropDownItems">Collection of drop down menu items to show.</param>
+        /// <param name="DropDownItems">Collection of menu items to add to the context menu.</param>
+        /// <param name="DropDownItems">Collection of menu items to add to the "Advanced" button underneath the list view.</param>
         /// <param name="List">Reference to the list that the menu items should be associated with.</param>
-        public delegate void ContextMenuInitializer(DbRecordCollectionView Sender, ToolStripItemCollection DropDownItems, ListView List);
+        public delegate void ContextMenuInitializer(DbRecordCollectionView Sender, ToolStripItemCollection ContextMenuItems, ToolStripItemCollection DropDownItems, ListView List);
 
         /// <summary>
         /// Delegate to use when specifying a method that is called whenever the menu created by <see cref="ContextMenuInitializer"/> is opened.
@@ -120,7 +121,17 @@ namespace Common.Data {
         /// <summary>
         /// Enumeration of all supported collection types
         /// </summary>
-        public enum CollectionType { HasMany, Association }
+        public enum CollectionType {
+            /// <summary>
+            /// The collection is of the HasMany&lt;T&gt; type;
+            /// </summary>
+            HasMany,
+            
+            /// <summary>
+            /// The collection is of the Association&lt;TKey, TValue&gt; type;
+            /// </summary>
+            Association
+        }
 
         /// <summary>
         /// Dictionary to convert from a full namespace to a collection type.
@@ -254,7 +265,7 @@ namespace Common.Data {
         /// </summary>
         public DbRecordCollectionView() {
             InitializeComponent();
-            SelectedListToolStrip.Renderer = new NoBorderToolStripRenderer();
+            ToolStrip.Renderer = new NoBorderToolStripRenderer();
         }
 
         /// <summary>
@@ -273,24 +284,31 @@ namespace Common.Data {
             if (MenuInitiliazer != null) {
                 MenuInitiliazer(
                     this,
-                    this.btnSelectedAdvanced.DropDownItems,
+                    this.contextMenu.Items,
+                    this.btnAdvanced.DropDownItems,
                     this.List);
             }
 
-            // Add the items of the toolstrip button's drop down menu to the actual context menu.
-            SelectedListContextMenu.Items.Clear();
-            SelectedListContextMenu.Items.AddRange(btnSelectedAdvanced.DropDownItems);
+            // Workaround for setting and retrieving the visibility of the buttons.
+            // See the comment at http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstripitem.visible.aspx.
+            bool add_visible = false; // TODO
+            bool remove_visible = false; // TODO
+            bool advanced_visible = (btnAdvanced.DropDownItems.Count > 0);
 
-            // Make sure the button is only visible if it has drop down items.
-            btnSelectedAdvanced.Visible = btnSelectedAdvanced.DropDownItems.Count > 0;
+            btnAddRecord.Visible = add_visible;
+            btnRemoveRecord.Visible = remove_visible;
+
+            // Make sure the advanced button is only visible if it has drop down items.
+            btnAdvanced.Visible = advanced_visible;
 
             // If there is no visible button on the tool strip, hide it.
-            SelectedListToolStrip.Visible = btnSelectedAddRecord.Visible
-                || btnSelectedRemoveRecord.Visible
-                || btnSelectedAdvanced.Visible;
+            bool toolstrip_visible = add_visible
+                || remove_visible
+                || advanced_visible;
+            ToolStrip.Visible = toolstrip_visible;
 
             // If the tool strip itself is not visible, increase the height of the list view.
-            if (!SelectedListToolStrip.Visible)
+            if (!toolstrip_visible)
                 List.Height = Height - List.Margin.Top - List.Margin.Bottom;
 
             // Register an event handler that gets called every time the context menu opens.
@@ -894,33 +912,33 @@ namespace Common.Data {
 
         #region GUI Event Handlers
 
-        private void btnSelectedAdvanced_DropDownOpening(object sender, EventArgs e) {
-            SetStateOfMenuItems(btnSelectedAdvanced.DropDownItems);
+        private void btnAdvanced_DropDownOpening(object sender, EventArgs e) {
+            SetStateOfMenuItems(btnAdvanced.DropDownItems);
 
             if (MenuLoading != null)
-                MenuLoading(this, btnSelectedAdvanced.DropDownItems, List);
+                MenuLoading(this, btnAdvanced.DropDownItems, List);
         }
 
-        private void SelectedListContextMenu_Opening(object sender, CancelEventArgs e) {
-            SetStateOfMenuItems(SelectedListContextMenu.Items);
+        private void contextMenu_Opening(object sender, CancelEventArgs e) {
+            SetStateOfMenuItems(contextMenu.Items);
 
             if (MenuLoading != null)
-                MenuLoading(this, SelectedListContextMenu.Items, List);
+                MenuLoading(this, contextMenu.Items, List);
         }
 
-        private void btnSelectedAddRecord_Click(object sender, EventArgs e) {
+        private void btnAddRecord_Click(object sender, EventArgs e) {
             // TODO
         }
 
-        private void btnSelectedRemoveRecord_Click(object sender, EventArgs e) {
+        private void btnRemoveRecord_Click(object sender, EventArgs e) {
             // TODO
         }
 
-        private void SelectedList_KeyDown(object sender, KeyEventArgs e) {
+        private void List_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Delete || e.KeyValue == 8) { // 8 = Backspace
                 // Delete the selected record
                 e.Handled = true;
-                btnSelectedRemoveRecord_Click(sender, null);
+                btnRemoveRecord_Click(sender, null);
             }
         }
 

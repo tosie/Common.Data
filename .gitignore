@@ -4,5 +4,7 @@ obj
 TestResults
 *.user
 Release
+Debug
+Debug-Out
 *.vsp
 *.psess
