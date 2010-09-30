@@ -43,8 +43,8 @@
             this.btnSelectedAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
             this.SelectedList = new Common.Data.FasterListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.lblText = new System.Windows.Forms.Label();
             this.SelectedListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.lblText = new System.Windows.Forms.Label();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -264,6 +264,12 @@
             this.columnHeader2.Text = "Name";
             this.columnHeader2.Width = 252;
             // 
+            // SelectedListContextMenu
+            // 
+            this.SelectedListContextMenu.Name = "SelectedListContextMenu";
+            this.SelectedListContextMenu.Size = new System.Drawing.Size(153, 26);
+            this.SelectedListContextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.SelectedListContextMenu_Opening);
+            // 
             // lblText
             // 
             this.lblText.AutoSize = true;
@@ -272,11 +278,6 @@
             this.lblText.Size = new System.Drawing.Size(39, 13);
             this.lblText.TabIndex = 3;
             this.lblText.Text = "<Title>";
-            // 
-            // SelectedListContextMenu
-            // 
-            this.SelectedListContextMenu.Name = "SelectedListContextMenu";
-            this.SelectedListContextMenu.Size = new System.Drawing.Size(61, 4);
             // 
             // CollectionEditForm
             // 
