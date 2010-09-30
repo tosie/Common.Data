@@ -93,6 +93,26 @@ namespace Common.Data {
             InitializeComponent();
         }
 
+        /// <param name="Owner">Window that is the owner of the form that is shown</param>
+        /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
+        /// <param name="Title">Text to show in the form's title bar and a caption label</param>
+        /// <param name="Records">The base records from which a user may select a record for editing</param>
+        /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
+        protected virtual void InitializeForm(IWin32Window Owner, String Name, String Title,
+                Type RecordType, List<IEditableDbRecord> Records) {
+            // Important for FormData.LoadFormData and FormData.SaveFormData
+            this.Name = Name;
+
+            this.Text = Title;
+            this.HeaderText = Title;
+
+            this.Records = Records;
+            this.RecordType = RecordType;
+
+            if (Owner == null)
+                this.ShowInTaskbar = true;
+        }
+
         #endregion
 
         #region Static Methods
@@ -139,17 +159,7 @@ namespace Common.Data {
         public static void EditRecords(IWin32Window Owner, String Name, String Title,
                 Type RecordType, List<IEditableDbRecord> Records) {
             using (DbRecordEditForm form = new DbRecordEditForm()) {
-                // Important for FormData.LoadFormData and FormData.SaveFormData
-                form.Name = Name;
-
-                form.Text = Title;
-                form.lblText.Text = Title;
-
-                form.Records = Records;
-                form.RecordType = RecordType;
-
-                if (Owner == null)
-                    form.ShowInTaskbar = true;
+                form.InitializeForm(Owner, Name, Title, RecordType, Records);
 
                 form.ShowDialog(Owner);
             }

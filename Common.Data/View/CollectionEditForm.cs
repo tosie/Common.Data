@@ -112,7 +112,7 @@ namespace Common.Data {
             this.Name = Name;
 
             this.Text = Title;
-            this.lblText.Text = Title;
+            this.HeaderText = Title;
 
             RecordList.RecordType = RecordType;
 

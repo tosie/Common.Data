@@ -356,7 +356,7 @@ namespace Common.Data {
         /// </summary>
         /// <seealso cref="SelectedRecord"/>
         /// <seealso cref="PropertyName"/>
-        protected virtual void RefreshView() {
+        public virtual void RefreshView() {
             BeginUpdate();
 
             try {

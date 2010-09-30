@@ -92,7 +92,7 @@ namespace Common.Data {
         /// Updates the configuration control with new data after the <see cref="SelectedRecord"/> has changed.
         /// </summary>
         /// <seealso cref="SelectedRecord"/>
-        protected virtual void RefreshView() {
+        public virtual void RefreshView() {
             if (SelectedRecord == null) {
                 
                 ConfigControl.Configuration = null;
