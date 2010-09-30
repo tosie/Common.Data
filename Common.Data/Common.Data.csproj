@@ -82,10 +82,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DbRecordCollectionView.cs">
+    <Compile Include="DbRecordView.cs">
       <SubType>UserControl</SubType>
     </Compile>
-    <Compile Include="DbRecordCollectionView.Designer.cs">
+    <Compile Include="DbRecordView.Designer.cs">
+      <DependentUpon>DbRecordView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\DbRecordCollectionView.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="View\DbRecordCollectionView.Designer.cs">
       <DependentUpon>DbRecordCollectionView.cs</DependentUpon>
     </Compile>
     <Compile Include="Model\Association.cs" />
@@ -134,7 +140,10 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DbRecordCollectionView.resx">
+    <EmbeddedResource Include="DbRecordView.resx">
+      <DependentUpon>DbRecordView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\DbRecordCollectionView.resx">
       <DependentUpon>DbRecordCollectionView.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">

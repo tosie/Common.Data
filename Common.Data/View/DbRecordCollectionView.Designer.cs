@@ -30,7 +30,7 @@
             this.btnSelectedAddRecord = new System.Windows.Forms.ToolStripButton();
             this.btnSelectedRemoveRecord = new System.Windows.Forms.ToolStripButton();
             this.btnSelectedAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
-            this.SelectedList = new Common.Data.FasterListView();
+            this.List = new Common.Data.FasterListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SelectedListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.SelectedListToolStrip.SuspendLayout();
@@ -87,27 +87,27 @@
             // 
             // SelectedList
             // 
-            this.SelectedList.AllowDrop = true;
-            this.SelectedList.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            this.List.AllowDrop = true;
+            this.List.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
                         | System.Windows.Forms.AnchorStyles.Left)
                         | System.Windows.Forms.AnchorStyles.Right)));
-            this.SelectedList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.List.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
-            this.SelectedList.ContextMenuStrip = this.SelectedListContextMenu;
-            this.SelectedList.FullRowSelect = true;
-            this.SelectedList.GridLines = true;
-            this.SelectedList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
-            this.SelectedList.HideSelection = false;
-            this.SelectedList.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
+            this.List.ContextMenuStrip = this.SelectedListContextMenu;
+            this.List.FullRowSelect = true;
+            this.List.GridLines = true;
+            this.List.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
+            this.List.HideSelection = false;
+            this.List.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1,
             listViewItem2});
-            this.SelectedList.LabelWrap = false;
-            this.SelectedList.Location = new System.Drawing.Point(3, 3);
-            this.SelectedList.Name = "SelectedList";
-            this.SelectedList.Size = new System.Drawing.Size(686, 368);
-            this.SelectedList.TabIndex = 4;
-            this.SelectedList.UseCompatibleStateImageBehavior = false;
-            this.SelectedList.View = System.Windows.Forms.View.Details;
+            this.List.LabelWrap = false;
+            this.List.Location = new System.Drawing.Point(3, 3);
+            this.List.Name = "SelectedList";
+            this.List.Size = new System.Drawing.Size(686, 368);
+            this.List.TabIndex = 4;
+            this.List.UseCompatibleStateImageBehavior = false;
+            this.List.View = System.Windows.Forms.View.Details;
             // 
             // columnHeader2
             // 
@@ -125,7 +125,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.SelectedListToolStrip);
-            this.Controls.Add(this.SelectedList);
+            this.Controls.Add(this.List);
             this.Name = "DbRecordCollectionView";
             this.Size = new System.Drawing.Size(692, 402);
             this.SelectedListToolStrip.ResumeLayout(false);
@@ -141,7 +141,7 @@
         protected System.Windows.Forms.ToolStripButton btnSelectedAddRecord;
         protected System.Windows.Forms.ToolStripButton btnSelectedRemoveRecord;
         protected System.Windows.Forms.ToolStripDropDownButton btnSelectedAdvanced;
-        protected FasterListView SelectedList;
+        protected FasterListView List;
         protected System.Windows.Forms.ColumnHeader columnHeader2;
         private System.Windows.Forms.ContextMenuStrip SelectedListContextMenu;
     }

@@ -23,7 +23,6 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
             System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.splitContainer = new System.Windows.Forms.SplitContainer();
@@ -35,9 +34,8 @@
             this.btnRecordAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
             this.smiRenameRecord = new System.Windows.Forms.ToolStripMenuItem();
             this.smiDuplicateRecord = new System.Windows.Forms.ToolStripMenuItem();
-            this.ConfigControl = new Common.Configuration.ConfigurationControl();
             this.lblText = new System.Windows.Forms.Label();
-            this.cmsLinkLabels = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.RecordView = new Common.Data.DbRecordView();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -61,7 +59,7 @@
             // 
             // splitContainer.Panel2
             // 
-            this.splitContainer.Panel2.Controls.Add(this.ConfigControl);
+            this.splitContainer.Panel2.Controls.Add(this.RecordView);
             this.splitContainer.Panel2.Padding = new System.Windows.Forms.Padding(3);
             this.splitContainer.Size = new System.Drawing.Size(694, 333);
             this.splitContainer.SplitterDistance = 250;
@@ -170,21 +168,6 @@
             this.smiDuplicateRecord.Text = "Duplizieren";
             this.smiDuplicateRecord.Click += new System.EventHandler(this.smiDuplicateScenario_Click);
             // 
-            // ConfigControl
-            // 
-            this.ConfigControl.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.ConfigControl.AutoSave = true;
-            this.ConfigControl.BackColor = System.Drawing.SystemColors.Window;
-            this.ConfigControl.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.ConfigControl.Configuration = null;
-            this.ConfigControl.Location = new System.Drawing.Point(6, 6);
-            this.ConfigControl.MultipleConfigs = null;
-            this.ConfigControl.Name = "ConfigControl";
-            this.ConfigControl.Size = new System.Drawing.Size(428, 321);
-            this.ConfigControl.TabIndex = 0;
-            // 
             // lblText
             // 
             this.lblText.AutoSize = true;
@@ -194,13 +177,14 @@
             this.lblText.TabIndex = 3;
             this.lblText.Text = "<Title>";
             // 
-            // cmsLinkLabels
+            // RecordView
             // 
-            this.cmsLinkLabels.Name = "cmsModels";
-            this.cmsLinkLabels.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsLinkLabels.ShowCheckMargin = true;
-            this.cmsLinkLabels.ShowImageMargin = false;
-            this.cmsLinkLabels.Size = new System.Drawing.Size(61, 4);
+            this.RecordView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RecordView.Location = new System.Drawing.Point(3, 3);
+            this.RecordView.Name = "RecordView";
+            this.RecordView.SelectedRecord = null;
+            this.RecordView.Size = new System.Drawing.Size(434, 327);
+            this.RecordView.TabIndex = 0;
             // 
             // DbRecordEditForm
             // 
@@ -216,9 +200,9 @@
             this.SizeGripStyle = System.Windows.Forms.SizeGripStyle.Show;
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "<Title>";
-            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DbRecordEditFormForm_FormClosing);
-            this.Load += new System.EventHandler(this.ScenarioForm_Load);
-            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DbRecordEditFormForm_KeyDown);
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.DbRecordEditForm_FormClosing);
+            this.Load += new System.EventHandler(this.DbRecordEditForm_Load);
+            this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DbRecordEditForm_KeyDown);
             this.splitContainer.Panel1.ResumeLayout(false);
             this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
@@ -241,9 +225,8 @@
         protected System.Windows.Forms.ToolStripDropDownButton btnRecordAdvanced;
         protected System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
         protected System.Windows.Forms.Label lblText;
-        protected System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
         protected System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
-        protected Configuration.ConfigurationControl ConfigControl;
+        private DbRecordView RecordView;
 
     }
 }

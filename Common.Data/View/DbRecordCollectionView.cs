@@ -12,15 +12,14 @@ using System.Collections;
 
 namespace Common.Data {
     /// <summary>
-    /// Provides a user control to edit collections of DbRecord instances.
+    /// Provides a user control to edit collections of a class type that implements the IEditableDbRecord interface.
     /// </summary>
     public partial class DbRecordCollectionView : UserControl {
 
         #region Data Structures
 
         /// <summary>
-        /// Used by <see cref="EditRecords"/> as a tuple to determine what columns
-        /// to show in the right list view.
+        /// Used by <see cref="EditRecords"/> as a tuple to determine what columns to show in the list view.
         /// </summary>
         public class ColumnDefinition {
             
@@ -103,7 +102,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Delegate to use when specifying a method that is responsible for initializing a drop down menu for the right list view.
+        /// Delegate to use when specifying a method that is responsible for initializing a drop down menu for the list view.
         /// </summary>
         /// <param name="Sender">Reference to the form that called this method.</param>
         /// <param name="DropDownItems">Collection of drop down menu items to show.</param>
@@ -144,11 +143,6 @@ namespace Common.Data {
         #region Properties / Class Variables
 
         /// <summary>
-        /// Used to remember a previously selected record.
-        /// </summary>
-        protected virtual IEditableDbRecord LastSelection { get; set; }
-        
-        /// <summary>
         /// Reference to the currently selected record. <seealso cref="SelectedRecord"/>.
         /// </summary>
         protected IEditableDbRecord selectedRecord = null;
@@ -156,6 +150,7 @@ namespace Common.Data {
         /// <summary>
         /// Gets or sets the record that is currently selected and thus whose collection should be shown.
         /// </summary>
+        [Browsable(false)]
         public IEditableDbRecord SelectedRecord {
             get {
                 return selectedRecord;
@@ -173,6 +168,7 @@ namespace Common.Data {
         /// <summary>
         /// Name of the collection relation. Must correspond to a property name of the owning record that is of type Association&lt;TKey, TValue&gt; or HasMany&lt;T&gt;. Set by <see cref="PrepareControl"/>.
         /// </summary>
+        [Browsable(false)]
         public String PropertyName { get; protected set; }
 
         /// <summary>
@@ -208,19 +204,22 @@ namespace Common.Data {
         /// <summary>
         /// Holds all records associated with the <see cref="SelectedRecord"/> via the <see cref="PropertyName"/>, if the property name corresponds with a HasMany&gt;T&lt; collection.
         /// </summary>
+        [Browsable(false)]
         public List<DbRecord> SelectedRecordsList { get; protected set; }
 
         /// <summary>
         /// Holds all records associated with the <see cref="SelectedRecord"/> via the <see cref="PropertyName"/>, if the property name corresponds with an Association&gt;TKey, TValue&lt; collection.
         /// </summary>
+        [Browsable(false)]
         public Dictionary<DbRecord, DbRecord> SelectedRecordsDict { get; protected set; }
 
         /// <summary>
-        /// Returns the list of selected items from the right list view.
+        /// Returns the list of selected items from the list view. The Tag of each item either represents a DbRecord or a KeyValuePair&lt;DbRecord, DbRecord&gt; type, depending on <see cref="PropertyCollectionType"/>.
         /// </summary>
+        [Browsable(false)]
         public ListView.SelectedListViewItemCollection SelectedCollectionItems {
             get {
-                return SelectedList.SelectedItems;
+                return List.SelectedItems;
             }
         }
 
@@ -229,11 +228,11 @@ namespace Common.Data {
         /// </summary>
         public Boolean AllowReordering {
             get {
-                return SelectedList.AllowDrop;
+                return List.AllowDrop;
             }
 
             protected set {
-                SelectedList.AllowDrop = value;
+                List.AllowDrop = value;
             }
         }
 
@@ -275,7 +274,7 @@ namespace Common.Data {
                 MenuInitiliazer(
                     this,
                     this.btnSelectedAdvanced.DropDownItems,
-                    this.SelectedList);
+                    this.List);
             }
 
             // Add the items of the toolstrip button's drop down menu to the actual context menu.
@@ -292,7 +291,7 @@ namespace Common.Data {
 
             // If the tool strip itself is not visible, increase the height of the list view.
             if (!SelectedListToolStrip.Visible)
-                SelectedList.Height = Height - SelectedList.Margin.Top - SelectedList.Margin.Bottom;
+                List.Height = Height - List.Margin.Top - List.Margin.Bottom;
 
             // Register an event handler that gets called every time the context menu opens.
             if (MenuLoading != null)
@@ -309,10 +308,10 @@ namespace Common.Data {
         void EditSelectedRecord() {
             if (SelectedRecord == null) {
                 Enabled = false;
-                SelectedList.Items.Clear();
-            } else if (LastSelection != SelectedRecord) {
+                List.Items.Clear();
+            } else {
                 Enabled = true;
-                UpdateData();
+                RefreshView();
             }
         }
 
@@ -342,14 +341,51 @@ namespace Common.Data {
         /// Disabled list redrawing. Call this before updating many records and call <see cref="EndUpdate"/> afterwards.
         /// </summary>
         public void BeginUpdate() {
-            SelectedList.BeginUpdate();
+            List.BeginUpdate();
         }
 
         /// <summary>
         /// Re-enabled list redrawing after a call to <see cref="BeginUpdate"/>. Call this after updating many records.
         /// </summary>
         public void EndUpdate() {
-            SelectedList.EndUpdate();
+            List.EndUpdate();
+        }
+
+        /// <summary>
+        /// Updates the list views with new data after the <see cref="SelectedRecord"/> or <see cref="PropertyName"/> have changed.
+        /// </summary>
+        /// <seealso cref="SelectedRecord"/>
+        /// <seealso cref="PropertyName"/>
+        protected virtual void RefreshView() {
+            BeginUpdate();
+
+            try {
+
+                List.Items.Clear();
+
+                // Reload the whole collection.
+                ReloadData();
+
+                // Make sure the properties are set.
+                if (SelectedRecord == null || String.IsNullOrEmpty(PropertyName))
+                    return;
+
+                // Show records in the list view.
+                try {
+                    // Get a list of all records that are contained in the collection.
+                    if (PropertyCollectionType == CollectionType.HasMany)
+                        ReadSelectedRecordsList();
+                    else if (PropertyCollectionType == CollectionType.Association)
+                        ReadSelectedRecordsDict();
+                    else
+                        Trace.Assert(false, "Unknown collection type.");
+
+                    AddRecordsToListViews();
+                } catch { }
+
+            } finally {
+                EndUpdate();
+            }
         }
 
         #endregion
@@ -357,7 +393,7 @@ namespace Common.Data {
         #region Data Handling (Collection)
 
         /// <summary>
-        /// Resets the properties that are initialized by <see cref="UpdateData"/> to
+        /// Resets the properties that are initialized by <see cref="RefreshView"/> to
         /// their default values.
         /// </summary>
         protected virtual void ResetProperties() {
@@ -475,9 +511,9 @@ namespace Common.Data {
         /// </summary>
         protected virtual void AddRecordsToListViews() {
             if (SelectedRecordsList != null)
-                AddRecordsToListView(SelectedRecordsList, SelectedList);
+                AddRecordsToListView(SelectedRecordsList, List);
             else if (SelectedRecordsDict != null)
-                AddRecordsToListView(SelectedRecordsDict, SelectedList);
+                AddRecordsToListView(SelectedRecordsDict, List);
             else
                 Trace.Assert(false, "Do not know what records to add to the list views.");
         }
@@ -487,59 +523,18 @@ namespace Common.Data {
         /// </summary>
         /// <see cref="SelectedRecord"/>
         /// <see cref="PropertyName"/>
-        protected virtual void UpdateData() {
-            SelectedList.BeginUpdate();
+        protected virtual void ReloadData() {
+            ResetProperties();
 
-            try {
+            // Make sure the properties are set
+            if (SelectedRecord == null || String.IsNullOrEmpty(PropertyName))
+                return;
 
-                SelectedList.Items.Clear();
+            // Analyze the SelectedRecord and PropertyName.
+            InitializePropertyReflection();
 
-                ResetProperties();
-
-                // Make sure the properties are set
-                if (SelectedRecord == null || String.IsNullOrEmpty(PropertyName))
-                    return;
-
-                // Analyze the SelectedRecord and PropertyName.
-                InitializePropertyReflection();
-
-                // Initialize the list view columns
-                SetupColumns(Columns, SelectedList);
-
-                // Show records in the right list view.
-                RefreshSelectedListData();
-
-            } finally {
-                SelectedList.EndUpdate();
-            }
-        }
-
-        /// <summary>
-        /// Refreshes the list of records shown in the list view.
-        /// </summary>
-        public void RefreshSelectedListData() {
-            SelectedList.BeginUpdate();
-
-            try {
-
-                SelectedList.Items.Clear();
-
-                try {
-                    // Get a list of all records that are already selected = (selected).
-                    if (PropertyCollectionType == CollectionType.HasMany)
-                        ReadSelectedRecordsList();
-                    else if (PropertyCollectionType == CollectionType.Association)
-                        ReadSelectedRecordsDict();
-                    else
-                        Trace.Assert(false, "Unknown collection type.");
-
-                    // Show (selected) and (available).
-                    AddRecordsToListViews();
-                } catch { }
-
-            } finally {
-                SelectedList.EndUpdate();
-            }
+            // Initialize the list view columns
+            SetupColumns(Columns, List);
         }
 
         #endregion
@@ -712,7 +707,7 @@ namespace Common.Data {
             if (SelectedRecord == null)
                 return;
 
-            UpdateRecordInListView(Record, SelectedList);
+            UpdateRecordInListView(Record, List);
         }
 
         #endregion
@@ -891,7 +886,7 @@ namespace Common.Data {
             if (SelectedRecord == null)
                 return;
 
-            UpdateRecordInListView(Record, SelectedList);
+            UpdateRecordInListView(Record, List);
         }
 
         #endregion
@@ -902,14 +897,14 @@ namespace Common.Data {
             SetStateOfMenuItems(btnSelectedAdvanced.DropDownItems);
 
             if (MenuLoading != null)
-                MenuLoading(this, btnSelectedAdvanced.DropDownItems, SelectedList);
+                MenuLoading(this, btnSelectedAdvanced.DropDownItems, List);
         }
 
         private void SelectedListContextMenu_Opening(object sender, CancelEventArgs e) {
             SetStateOfMenuItems(SelectedListContextMenu.Items);
 
             if (MenuLoading != null)
-                MenuLoading(this, SelectedListContextMenu.Items, SelectedList);
+                MenuLoading(this, SelectedListContextMenu.Items, List);
         }
 
         private void btnSelectedAddRecord_Click(object sender, EventArgs e) {

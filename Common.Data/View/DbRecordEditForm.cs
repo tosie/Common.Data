@@ -12,12 +12,21 @@ using System.Reflection;
 using System.Collections;
 
 namespace Common.Data {
+    /// <summary>
+    /// A form that allows a list of IEditableDbRecord instances to be edited.
+    /// </summary>
     public partial class DbRecordEditForm : Form {
 
         #region Properties / Class Variables
 
+        /// <summary>
+        /// Holds the list of the records that are shown in the list view.
+        /// </summary>
         protected List<IEditableDbRecord> records;
         
+        /// <summary>
+        /// Gets/sets the records to be shown in the list view.
+        /// </summary>
         public List<IEditableDbRecord> Records {
             get {
                 return records;
@@ -29,8 +38,14 @@ namespace Common.Data {
             }
         }
 
+        /// <summary>
+        /// Contains the type of record that is the basis when adding a new record.
+        /// </summary>
         protected Type recordType;
 
+        /// <summary>
+        /// Gets/sets the type of record that is used when creating a new record.
+        /// </summary>
         public Type RecordType {
             get {
                 return recordType;
@@ -54,9 +69,19 @@ namespace Common.Data {
             }
         }
 
+        /// <summary>
+        /// Method that is invoked when a new record should be created. Set by <see cref="RecordType"/>.
+        /// </summary>
         protected MethodInfo createRecord = null;
 
+        /// <summary>
+        /// Contains the last selection made in the list view.
+        /// </summary>
         protected IEditableDbRecord LastSelection { get; set; }
+
+        /// <summary>
+        /// Gets the currently selected record from the list view.
+        /// </summary>
         protected IEditableDbRecord SelectedRecord {
             get {
                 if (List.SelectedItems.Count <= 0)
@@ -66,8 +91,9 @@ namespace Common.Data {
             }
         }
 
-        protected Boolean LoadingRecord { get; set; }
-
+        /// <summary>
+        /// Gets/sets the text that is shown as a header text of the form (not its title, but like a subtitle).
+        /// </summary>
         public String HeaderText {
             get { return lblText.Text; }
             set { lblText.Text = value; }
@@ -77,12 +103,14 @@ namespace Common.Data {
 
         #region Constructors / Initialization
 
+        /// <summary>
+        /// Constructor.
+        /// </summary>
         public DbRecordEditForm() {
             InitializeComponent();
             ListToolStrip.Renderer = new NoBorderToolStripRenderer();
 
             List.Items.Clear();
-            LoadingRecord = false;
             List_Resize(null, null);
             EditSelectedRecord();
         }
@@ -174,6 +202,7 @@ namespace Common.Data {
                     continue;
 
                 SelectRecord(item, EnsureVisibility, EditAfterSelect);
+                break;
             }
         }
 
@@ -191,6 +220,11 @@ namespace Common.Data {
 
         #region Record Creation / Duplication / Deletion
 
+        /// <summary>
+        /// Creates a new record and adds it to the list of shown records. Can be overwritten to accomodate custom requirements.
+        /// </summary>
+        /// <param name="SuggestedName">The name to use for the new record.</param>
+        /// <returns>An instance of a new record of a type that is specified by <see cref="RecordType"/>.</returns>
         protected virtual IEditableDbRecord CreateNewRecord(String SuggestedName) {
             if (createRecord == null)
                 return null;
@@ -205,6 +239,10 @@ namespace Common.Data {
             return result;
         }
 
+        /// <summary>
+        /// Deletes a record from the database and removes it from the list of shown records.
+        /// </summary>
+        /// <param name="Record">The record to delete.</param>
         protected virtual void DeleteRecord(IEditableDbRecord Record) {
             if (!Record.Delete())
                 return;
@@ -268,36 +306,36 @@ namespace Common.Data {
         }
 
         void EditSelectedRecord() {
-            LoadingRecord = true;
-
-            try {
-                if (SelectedRecord == null) {
-                    splitContainer.Panel2.Enabled = false;
-                    //Grid.BackColor = SystemColors.ControlLight;
-
-                    ConfigControl.Configuration = null;
-                } else if (LastSelection != SelectedRecord) {
-                    splitContainer.Panel2.Enabled = true;
-                    //Grid.BackColor = SystemColors.Window;
-
-                    ConfigControl.Configuration = GenericConfiguration.CreateFor(SelectedRecord);
-                    foreach (ConfigurationEntry entry in ConfigControl.Configuration) {
-                        entry.PropertyChanged += new PropertyChangedEventHandler(entry_PropertyChanged);
-                    }
-                }
-            } finally {
-                LoadingRecord = false;
+            if (SelectedRecord == null) {
+                splitContainer.Panel2.Enabled = false;
+                //Grid.BackColor = SystemColors.ControlLight;
+            } else if (LastSelection != SelectedRecord) {
+                splitContainer.Panel2.Enabled = true;
+                //Grid.BackColor = SystemColors.Window;
             }
+
+            RecordView.SelectedRecord = SelectedRecord;
         }
 
-        void entry_PropertyChanged(object sender, PropertyChangedEventArgs e) {
-            if (e.PropertyName == "Value") {
-                
-                // TODO: Do not save here, bust just mark the record as dirty. Then save whenever
-                //       another record is selected, the window is closed, etc.
-                
-                // Save any changes to the record
-                SelectedRecord.Update();
+        /// <summary>
+        /// Enabled or disables the given collection of ToolStripItems depending on their Tag value.
+        /// </summary>
+        /// <param name="items"></param>
+        private void SetStateOfMenuItems(ToolStripItemCollection items) {
+            var record_selected = SelectedRecord != null;
+
+            foreach (ToolStripMenuItem item in items) {
+                if (item.Tag == null || !(item.Tag is String))
+                    continue;
+
+                switch ((String)item.Tag) {
+                    case "SelectedRecord != null":
+                        // Enable if something in the left list view is selected
+                        item.Enabled = record_selected;
+                        break;
+                    default:
+                        break;
+                }
             }
         }
 
@@ -305,15 +343,15 @@ namespace Common.Data {
 
         #region GUI Event Handlers
 
-        private void ScenarioForm_Load(object sender, EventArgs e) {
+        private void DbRecordEditForm_Load(object sender, EventArgs e) {
             FormData.LoadFormData(this);
         }
 
-        private void DbRecordEditFormForm_FormClosing(object sender, FormClosingEventArgs e) {
+        private void DbRecordEditForm_FormClosing(object sender, FormClosingEventArgs e) {
             FormData.SaveFormData(this);
         }
 
-        private void DbRecordEditFormForm_KeyDown(object sender, KeyEventArgs e) {
+        private void DbRecordEditForm_KeyDown(object sender, KeyEventArgs e) {
             if (e.KeyCode == Keys.Escape)
                 Close();
         }
@@ -374,21 +412,7 @@ namespace Common.Data {
         }
 
         private void btnRecordAdvanced_DropDownOpening(object sender, EventArgs e) {
-            Boolean record_selected = SelectedRecord != null;
-
-            foreach (ToolStripMenuItem item in btnRecordAdvanced.DropDownItems) {
-                if (item.Tag == null || !(item.Tag is String))
-                    continue;
-
-                switch ((String)item.Tag) {
-                    case "SelectedRecord != null":
-                        // Enable if a Scenario is selected
-                        item.Enabled = record_selected;
-                        break;
-                    default:
-                        break;
-                }
-            }
+            SetStateOfMenuItems(btnRecordAdvanced.DropDownItems);
         }
 
         private void smiRenameScenario_Click(object sender, EventArgs e) {

@@ -14,26 +14,26 @@ namespace Common.Data.Test.GUI {
         }
 
         private void button1_Click(object sender, EventArgs e) {
-            var a = Author.Create();
-            a.Name = "Jackson";
-            a.Books.Add(Book.Create("Book 1"));
-            a.Books.Add(Book.Create("Book 2"));
-            a.Update();
+            //var a = Author.Create();
+            //a.Name = "Jackson";
+            //a.Books.Add(Book.Create("Book 1"));
+            //a.Books.Add(Book.Create("Book 2"));
+            //a.Update();
 
             Author.ShowEditForm(this);
         }
 
         private void button2_Click(object sender, EventArgs e) {
-            var columns = new CollectionEditForm.ColumnDefinition[] {
-                new CollectionEditForm.ColumnDefinition("Key.Name", "Key", 150),
-                new CollectionEditForm.ColumnDefinition("Value.Name", "Value", 100)
+            var columns = new DbRecordCollectionView.ColumnDefinition[] {
+                new DbRecordCollectionView.ColumnDefinition("Key.Name", "Key", 150),
+                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", 100)
             };
 
-            CollectionEditForm.DropDownMenuInitializer menuinit = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, DropDownItems, List) => {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            CollectionEditForm.DropDownMenuLoading menuload = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, DropDownItems, List) => {
                 // Nothing to do for now
             };
 
@@ -47,15 +47,15 @@ namespace Common.Data.Test.GUI {
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            var columns = new CollectionEditForm.ColumnDefinition[] {
-                new CollectionEditForm.ColumnDefinition("Name", "Name", 150),
+            var columns = new DbRecordCollectionView.ColumnDefinition[] {
+                new DbRecordCollectionView.ColumnDefinition("Name", "Name", 150),
             };
 
-            CollectionEditForm.DropDownMenuInitializer menuinit = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, DropDownItems, List) => {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            CollectionEditForm.DropDownMenuLoading menuload = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, DropDownItems, List) => {
                 // Nothing to do for now
             };
 
