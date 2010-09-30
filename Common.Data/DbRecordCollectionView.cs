@@ -316,6 +316,42 @@ namespace Common.Data {
             }
         }
 
+        /// <summary>
+        /// Enabled or disables the given collection of ToolStripItems depending on their Tag value.
+        /// </summary>
+        /// <param name="items"></param>
+        private void SetStateOfMenuItems(ToolStripItemCollection items) {
+            var record_selected = SelectedRecord != null;
+
+            foreach (ToolStripMenuItem item in items) {
+                if (item.Tag == null || !(item.Tag is String))
+                    continue;
+
+                switch ((String)item.Tag) {
+                    case "SelectedRecord != null":
+                        // Enable if something in the left list view is selected
+                        item.Enabled = record_selected;
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Disabled list redrawing. Call this before updating many records and call <see cref="EndUpdate"/> afterwards.
+        /// </summary>
+        public void BeginUpdate() {
+            SelectedList.BeginUpdate();
+        }
+
+        /// <summary>
+        /// Re-enabled list redrawing after a call to <see cref="BeginUpdate"/>. Call this after updating many records.
+        /// </summary>
+        public void EndUpdate() {
+            SelectedList.EndUpdate();
+        }
+
         #endregion
 
         #region Data Handling (Collection)
@@ -861,24 +897,6 @@ namespace Common.Data {
         #endregion
 
         #region GUI Event Handlers
-
-        private void SetStateOfMenuItems(ToolStripItemCollection items) {
-            var record_selected = SelectedRecord != null;
-
-            foreach (ToolStripMenuItem item in items) {
-                if (item.Tag == null || !(item.Tag is String))
-                    continue;
-
-                switch ((String)item.Tag) {
-                    case "SelectedRecord != null":
-                        // Enable if something in the left list view is selected
-                        item.Enabled = record_selected;
-                        break;
-                    default:
-                        break;
-                }
-            }
-        }
 
         private void btnSelectedAdvanced_DropDownOpening(object sender, EventArgs e) {
             SetStateOfMenuItems(btnSelectedAdvanced.DropDownItems);
