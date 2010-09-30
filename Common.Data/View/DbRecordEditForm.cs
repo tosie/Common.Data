@@ -20,74 +20,28 @@ namespace Common.Data {
         #region Properties / Class Variables
 
         /// <summary>
-        /// Holds the list of the records that are shown in the list view.
-        /// </summary>
-        protected List<IEditableDbRecord> records;
-        
-        /// <summary>
         /// Gets/sets the records to be shown in the list view.
         /// </summary>
         public List<IEditableDbRecord> Records {
             get {
-                return records;
+                return RecordList.PreloadedRecords;
             }
 
             set {
-                records = value;
-                ShowRecords();
+                RecordList.PreloadedRecords = value;
             }
         }
-
-        /// <summary>
-        /// Contains the type of record that is the basis when adding a new record.
-        /// </summary>
-        protected Type recordType;
 
         /// <summary>
         /// Gets/sets the type of record that is used when creating a new record.
         /// </summary>
         public Type RecordType {
             get {
-                return recordType;
+                return RecordList.RecordType;
             }
 
             set {
-                recordType = value;
-
-                try {
-                    createRecord = recordType.GetMethod(
-                        "Create",
-                        BindingFlags.Public | BindingFlags.Static,
-                        null,
-                        new Type[] { },
-                        null);
-                } catch {
-                    createRecord = null;
-                }
-
-                btnAddRecord.Visible = createRecord != null;
-            }
-        }
-
-        /// <summary>
-        /// Method that is invoked when a new record should be created. Set by <see cref="RecordType"/>.
-        /// </summary>
-        protected MethodInfo createRecord = null;
-
-        /// <summary>
-        /// Contains the last selection made in the list view.
-        /// </summary>
-        protected IEditableDbRecord LastSelection { get; set; }
-
-        /// <summary>
-        /// Gets the currently selected record from the list view.
-        /// </summary>
-        protected IEditableDbRecord SelectedRecord {
-            get {
-                if (List.SelectedItems.Count <= 0)
-                    return null;
-
-                return (IEditableDbRecord)List.SelectedItems[0].Tag;
+                RecordList.RecordType = value;
             }
         }
 
@@ -101,6 +55,35 @@ namespace Common.Data {
 
         #endregion
 
+        #region Events
+
+        /// <summary>
+        /// This event is fired before a new record is created.
+        /// </summary>
+        public event RecordEventHandler AddingRecord;
+
+        /// <summary>
+        /// This event is fired after a new record has been added to the list and database.
+        /// </summary>
+        public event RecordEventHandler AddedRecord;
+
+        /// <summary>
+        /// This event is fired before a record is deleted from the database and the list.
+        /// </summary>
+        public event RecordEventHandler DeletingRecord;
+
+        /// <summary>
+        /// This event is fired after a record is deleted from the database and the list.
+        /// </summary>
+        public event RecordEventHandler DeletedRecord;
+
+        /// <summary>
+        /// Fired when a record is selected and when a selected record is deselected.
+        /// </summary>
+        public event RecordEventHandler RecordSelected;
+
+        #endregion
+
         #region Constructors / Initialization
 
         /// <summary>
@@ -108,11 +91,6 @@ namespace Common.Data {
         /// </summary>
         public DbRecordEditForm() {
             InitializeComponent();
-            ListToolStrip.Renderer = new NoBorderToolStripRenderer();
-
-            List.Items.Clear();
-            List_Resize(null, null);
-            EditSelectedRecord();
         }
 
         #endregion
@@ -147,20 +125,7 @@ namespace Common.Data {
                 Records = new List<IEditableDbRecord>();
             }
 
-            using (DbRecordEditForm form = new DbRecordEditForm()) {
-                // Important for FormData.LoadFormData and FormData.SaveFormData
-                form.Name = Name;
-                form.Text = Title;
-                form.lblText.Text = Title;
-
-                form.Records = Records;
-                form.RecordType = RecordType;
-
-                if (Owner == null)
-                    form.ShowInTaskbar = true;
-
-                form.ShowDialog(Owner);
-            }
+            EditRecords(Owner, Name, Title, RecordType, Records);
         }
 
         /// <summary>
@@ -176,6 +141,7 @@ namespace Common.Data {
             using (DbRecordEditForm form = new DbRecordEditForm()) {
                 // Important for FormData.LoadFormData and FormData.SaveFormData
                 form.Name = Name;
+
                 form.Text = Title;
                 form.lblText.Text = Title;
 
@@ -186,156 +152,6 @@ namespace Common.Data {
                     form.ShowInTaskbar = true;
 
                 form.ShowDialog(Owner);
-            }
-        }
-
-        #endregion
-
-        #region Record Selection
-
-        void SelectRecord(IEditableDbRecord Record, Boolean EnsureVisibility, Boolean EditAfterSelect) {
-            if (List.Items.Count <= 0)
-                return;
-
-            foreach (ListViewItem item in List.Items) {
-                if ((IEditableDbRecord)item.Tag != Record)
-                    continue;
-
-                SelectRecord(item, EnsureVisibility, EditAfterSelect);
-                break;
-            }
-        }
-
-        void SelectRecord(ListViewItem Item, Boolean EnsureVisibility, Boolean EditAfterSelect) {
-            Item.Selected = true;
-
-            if (EnsureVisibility || EditAfterSelect)
-                Item.EnsureVisible();
-
-            if (EditAfterSelect)
-                Item.BeginEdit();
-        }
-
-        #endregion
-
-        #region Record Creation / Duplication / Deletion
-
-        /// <summary>
-        /// Creates a new record and adds it to the list of shown records. Can be overwritten to accomodate custom requirements.
-        /// </summary>
-        /// <param name="SuggestedName">The name to use for the new record.</param>
-        /// <returns>An instance of a new record of a type that is specified by <see cref="RecordType"/>.</returns>
-        protected virtual IEditableDbRecord CreateNewRecord(String SuggestedName) {
-            if (createRecord == null)
-                return null;
-
-            IEditableDbRecord result = (IEditableDbRecord)createRecord.Invoke(null, null);
-
-            result.Name = SuggestedName;
-            result.Update();
-
-            Records.Add(result);
-
-            return result;
-        }
-
-        /// <summary>
-        /// Deletes a record from the database and removes it from the list of shown records.
-        /// </summary>
-        /// <param name="Record">The record to delete.</param>
-        protected virtual void DeleteRecord(IEditableDbRecord Record) {
-            if (!Record.Delete())
-                return;
-
-            Records.Remove(Record);
-        }
-
-        Boolean RecordNameAlreadyExists(String Name) {
-            try {
-                return Records.SingleOrDefault(j => j.Name == Name) != null;
-            } catch {
-                // Exception is thrown when the list contains more than one entry with the name
-                return true;
-            }
-        }
-
-        String FindNewNameForRecord(String Template) {
-            String template_first = Template;
-            String template_more = Template + " ({0})";
-
-            if (!RecordNameAlreadyExists(template_first))
-                return template_first;
-
-            Int32 counter = 1;
-            String current_name;
-
-            do {
-                counter++;
-                current_name = String.Format(template_more, counter);
-
-                Trace.Assert(counter < Int32.MaxValue, "The counter is too high.");
-            } while (RecordNameAlreadyExists(current_name));
-
-            return current_name;
-        }
-
-        #endregion
-
-        #region GUI Support
-
-        ListViewItem AddRecordToListView(IEditableDbRecord Record) {
-            ListViewItem item = new ListViewItem();
-
-            item.Text = Record.Name;
-            item.Tag = Record;
-
-            return List.Items.Add(item);
-        }
-
-        void ShowRecords() {
-            List.Items.Clear();
-
-            if (Records == null || Records.Count <= 0)
-                return;
-
-            Records.ForEach(j => AddRecordToListView(j));
-            List.Sort();
-
-            if (List.Items.Count > 0)
-                List.Items[0].Selected = true;
-        }
-
-        void EditSelectedRecord() {
-            if (SelectedRecord == null) {
-                splitContainer.Panel2.Enabled = false;
-                //Grid.BackColor = SystemColors.ControlLight;
-            } else if (LastSelection != SelectedRecord) {
-                splitContainer.Panel2.Enabled = true;
-                //Grid.BackColor = SystemColors.Window;
-            }
-
-            RecordView.SelectedRecord = SelectedRecord;
-        }
-
-        /// <summary>
-        /// Enabled or disables the given collection of ToolStripItems depending on their Tag value.
-        /// </summary>
-        /// <param name="items"></param>
-        private void SetStateOfMenuItems(ToolStripItemCollection items) {
-            var record_selected = SelectedRecord != null;
-
-            foreach (ToolStripMenuItem item in items) {
-                if (item.Tag == null || !(item.Tag is String))
-                    continue;
-
-                switch ((String)item.Tag) {
-                    case "SelectedRecord != null":
-                        // Enable if something in the left list view is selected
-                        item.Enabled = record_selected;
-                        break;
-                    default:
-                        break;
-                }
             }
         }
 
@@ -356,82 +172,31 @@ namespace Common.Data {
                 Close();
         }
 
-        private void btnAddRecord_Click(object sender, EventArgs e) {
-            // Create a new instance
-            IEditableDbRecord new_record = CreateNewRecord(FindNewNameForRecord("Neuer Eintrag"));
-            if (new_record == null)
-                return;
-
-            // Show it in the list view
-            ListViewItem new_item = AddRecordToListView(new_record);
-            SelectRecord(new_item, true, true);
+        private void RecordList_AddingRecord(Control sender, RecordEventArgs e) {
+            var args = RecordEvent.Fire(this, AddingRecord, e.Record);
+            e.CopyFrom(args);
         }
 
-        private void btnDeleteRecord_Click(object sender, EventArgs e) {
-            if (SelectedRecord == null)
-                return;
-
-            DeleteRecord(SelectedRecord);
-
-            Int32 selected = List.SelectedItems[0].Index;
-            List.SelectedItems[0].Remove();
-
-            if (List.Items.Count > selected)
-                SelectRecord(List.Items[selected], true, false);
-            else if (List.Items.Count > 0)
-                SelectRecord(List.Items[selected - 1], true, false);
+        private void RecordList_AddedRecord(Control sender, RecordEventArgs e) {
+            var args = RecordEvent.Fire(this, AddedRecord, e.Record);
+            e.CopyFrom(args);
         }
 
-        private void List_KeyDown(object sender, KeyEventArgs e) {
-            if (e.KeyCode == Keys.Delete || e.KeyValue == 8) { // 8 = Backspace
-                e.Handled = true;
-                btnDeleteRecord_Click(sender, null);
-            }
+        private void RecordList_DeletingRecord(Control sender, RecordEventArgs e) {
+            var args = RecordEvent.Fire(this, DeletingRecord, e.Record);
+            e.CopyFrom(args);
         }
 
-        private void List_AfterLabelEdit(object sender, LabelEditEventArgs e) {
-            if (e.Label == null || e.Label == String.Empty) {
-                e.CancelEdit = true;
-                return;
-            }
-
-            IEditableDbRecord record = (IEditableDbRecord)List.Items[e.Item].Tag;
-            record.Name = e.Label;
-            record.Update();
-
-            List.Sort();
+        private void RecordList_DeletedRecord(Control sender, RecordEventArgs e) {
+            var args = RecordEvent.Fire(this, DeletedRecord, e.Record);
+            e.CopyFrom(args);
         }
 
-        private void List_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) {
-            EditSelectedRecord();
-            LastSelection = SelectedRecord;
-        }
+        private void RecordList_RecordSelected(Control sender, RecordEventArgs e) {
+            RecordView.SelectedRecord = e.Record;
 
-        private void List_Resize(object sender, EventArgs e) {
-            List.Columns[0].Width = List.Width - 30;
-        }
-
-        private void btnRecordAdvanced_DropDownOpening(object sender, EventArgs e) {
-            SetStateOfMenuItems(btnRecordAdvanced.DropDownItems);
-        }
-
-        private void smiRenameScenario_Click(object sender, EventArgs e) {
-            SelectRecord(List.SelectedItems[0], true, true);
-        }
-
-        private void smiDuplicateScenario_Click(object sender, EventArgs e) {
-            // Basisinstanz merken
-            IEditableDbRecord template = SelectedRecord;
-
-            // Neue Instanz erstellen
-            IEditableDbRecord duplicate = template.Duplicate();
-            duplicate.Name = FindNewNameForRecord(template.Name);
-            duplicate.Update();
-            Records.Add(duplicate);
-
-            // In ListView anzeigen
-            ListViewItem new_item = AddRecordToListView(duplicate);
-            SelectRecord(new_item, true, true);
+            var args = RecordEvent.Fire(this, RecordSelected, e.Record);
+            e.CopyFrom(args);
         }
 
         #endregion

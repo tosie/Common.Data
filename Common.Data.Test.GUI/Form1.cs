@@ -26,7 +26,7 @@ namespace Common.Data.Test.GUI {
         private void button2_Click(object sender, EventArgs e) {
             var columns = new DbRecordCollectionView.ColumnDefinition[] {
                 new DbRecordCollectionView.ColumnDefinition("Key.Name", "Key", 150),
-                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", 100)
+                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", -1)
             };
 
             DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, DropDownItems, List) => {

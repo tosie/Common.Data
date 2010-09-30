@@ -23,23 +23,13 @@
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("Item 1");
-            System.Windows.Forms.ListViewItem listViewItem2 = new System.Windows.Forms.ListViewItem("Item 2");
             this.splitContainer = new System.Windows.Forms.SplitContainer();
-            this.List = new System.Windows.Forms.ListView();
-            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.ListToolStrip = new System.Windows.Forms.ToolStrip();
-            this.btnAddRecord = new System.Windows.Forms.ToolStripButton();
-            this.btnRemoveRecord = new System.Windows.Forms.ToolStripButton();
-            this.btnRecordAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
-            this.smiRenameRecord = new System.Windows.Forms.ToolStripMenuItem();
-            this.smiDuplicateRecord = new System.Windows.Forms.ToolStripMenuItem();
-            this.lblText = new System.Windows.Forms.Label();
+            this.RecordList = new Common.Data.DbRecordList();
             this.RecordView = new Common.Data.DbRecordView();
+            this.lblText = new System.Windows.Forms.Label();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
-            this.ListToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // splitContainer
@@ -53,8 +43,7 @@
             // 
             // splitContainer.Panel1
             // 
-            this.splitContainer.Panel1.Controls.Add(this.List);
-            this.splitContainer.Panel1.Controls.Add(this.ListToolStrip);
+            this.splitContainer.Panel1.Controls.Add(this.RecordList);
             this.splitContainer.Panel1.Padding = new System.Windows.Forms.Padding(3);
             // 
             // splitContainer.Panel2
@@ -65,117 +54,20 @@
             this.splitContainer.SplitterDistance = 250;
             this.splitContainer.TabIndex = 2;
             // 
-            // List
+            // RecordList
             // 
-            this.List.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
-            this.List.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.columnHeader1});
-            this.List.FullRowSelect = true;
-            this.List.GridLines = true;
-            this.List.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.None;
-            this.List.HideSelection = false;
-            this.List.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
-            listViewItem1,
-            listViewItem2});
-            this.List.LabelEdit = true;
-            this.List.LabelWrap = false;
-            this.List.Location = new System.Drawing.Point(6, 6);
-            this.List.MultiSelect = false;
-            this.List.Name = "List";
-            this.List.Size = new System.Drawing.Size(238, 293);
-            this.List.Sorting = System.Windows.Forms.SortOrder.Ascending;
-            this.List.TabIndex = 0;
-            this.List.UseCompatibleStateImageBehavior = false;
-            this.List.View = System.Windows.Forms.View.Details;
-            this.List.AfterLabelEdit += new System.Windows.Forms.LabelEditEventHandler(this.List_AfterLabelEdit);
-            this.List.ItemSelectionChanged += new System.Windows.Forms.ListViewItemSelectionChangedEventHandler(this.List_ItemSelectionChanged);
-            this.List.KeyDown += new System.Windows.Forms.KeyEventHandler(this.List_KeyDown);
-            this.List.Resize += new System.EventHandler(this.List_Resize);
-            // 
-            // columnHeader1
-            // 
-            this.columnHeader1.Text = "Name";
-            this.columnHeader1.Width = 252;
-            // 
-            // ListToolStrip
-            // 
-            this.ListToolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.ListToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
-            this.ListToolStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.btnAddRecord,
-            this.btnRemoveRecord,
-            this.btnRecordAdvanced});
-            this.ListToolStrip.Location = new System.Drawing.Point(3, 302);
-            this.ListToolStrip.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.ListToolStrip.Name = "ListToolStrip";
-            this.ListToolStrip.Padding = new System.Windows.Forms.Padding(3, 0, 3, 3);
-            this.ListToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.ListToolStrip.Size = new System.Drawing.Size(244, 28);
-            this.ListToolStrip.TabIndex = 2;
-            // 
-            // btnAddRecord
-            // 
-            this.btnAddRecord.AutoSize = false;
-            this.btnAddRecord.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnAddRecord.Image = global::Common.Data.Properties.Resources.CircularPlus;
-            this.btnAddRecord.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.btnAddRecord.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnAddRecord.Name = "btnAddRecord";
-            this.btnAddRecord.Size = new System.Drawing.Size(30, 22);
-            this.btnAddRecord.Click += new System.EventHandler(this.btnAddRecord_Click);
-            // 
-            // btnRemoveRecord
-            // 
-            this.btnRemoveRecord.AutoSize = false;
-            this.btnRemoveRecord.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnRemoveRecord.Image = global::Common.Data.Properties.Resources.CircularMinus;
-            this.btnRemoveRecord.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.btnRemoveRecord.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRemoveRecord.Name = "btnRemoveRecord";
-            this.btnRemoveRecord.Size = new System.Drawing.Size(30, 22);
-            this.btnRemoveRecord.Click += new System.EventHandler(this.btnDeleteRecord_Click);
-            // 
-            // btnRecordAdvanced
-            // 
-            this.btnRecordAdvanced.AutoSize = false;
-            this.btnRecordAdvanced.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
-            this.btnRecordAdvanced.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.smiRenameRecord,
-            this.smiDuplicateRecord});
-            this.btnRecordAdvanced.Image = global::Common.Data.Properties.Resources.ActionGlyph;
-            this.btnRecordAdvanced.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
-            this.btnRecordAdvanced.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRecordAdvanced.Name = "btnRecordAdvanced";
-            this.btnRecordAdvanced.ShowDropDownArrow = false;
-            this.btnRecordAdvanced.Size = new System.Drawing.Size(40, 22);
-            this.btnRecordAdvanced.DropDownOpening += new System.EventHandler(this.btnRecordAdvanced_DropDownOpening);
-            // 
-            // smiRenameRecord
-            // 
-            this.smiRenameRecord.Name = "smiRenameRecord";
-            this.smiRenameRecord.Size = new System.Drawing.Size(148, 22);
-            this.smiRenameRecord.Tag = "SelectedRecord != null";
-            this.smiRenameRecord.Text = "Umbenennen";
-            this.smiRenameRecord.Click += new System.EventHandler(this.smiRenameScenario_Click);
-            // 
-            // smiDuplicateRecord
-            // 
-            this.smiDuplicateRecord.Name = "smiDuplicateRecord";
-            this.smiDuplicateRecord.Size = new System.Drawing.Size(148, 22);
-            this.smiDuplicateRecord.Tag = "SelectedRecord != null";
-            this.smiDuplicateRecord.Text = "Duplizieren";
-            this.smiDuplicateRecord.Click += new System.EventHandler(this.smiDuplicateScenario_Click);
-            // 
-            // lblText
-            // 
-            this.lblText.AutoSize = true;
-            this.lblText.Location = new System.Drawing.Point(12, 9);
-            this.lblText.Name = "lblText";
-            this.lblText.Size = new System.Drawing.Size(39, 13);
-            this.lblText.TabIndex = 3;
-            this.lblText.Text = "<Title>";
+            this.RecordList.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.RecordList.Location = new System.Drawing.Point(3, 3);
+            this.RecordList.Name = "RecordList";
+            this.RecordList.PreloadedRecords = null;
+            this.RecordList.RecordType = null;
+            this.RecordList.Size = new System.Drawing.Size(244, 327);
+            this.RecordList.TabIndex = 0;
+            this.RecordList.AddingRecord += new Common.Data.RecordEventHandler(this.RecordList_AddingRecord);
+            this.RecordList.AddedRecord += new Common.Data.RecordEventHandler(this.RecordList_AddedRecord);
+            this.RecordList.DeletingRecord += new Common.Data.RecordEventHandler(this.RecordList_DeletingRecord);
+            this.RecordList.DeletedRecord += new Common.Data.RecordEventHandler(this.RecordList_DeletedRecord);
+            this.RecordList.RecordSelected += new Common.Data.RecordEventHandler(this.RecordList_RecordSelected);
             // 
             // RecordView
             // 
@@ -185,6 +77,15 @@
             this.RecordView.SelectedRecord = null;
             this.RecordView.Size = new System.Drawing.Size(434, 327);
             this.RecordView.TabIndex = 0;
+            // 
+            // lblText
+            // 
+            this.lblText.AutoSize = true;
+            this.lblText.Location = new System.Drawing.Point(12, 9);
+            this.lblText.Name = "lblText";
+            this.lblText.Size = new System.Drawing.Size(39, 13);
+            this.lblText.TabIndex = 3;
+            this.lblText.Text = "<Title>";
             // 
             // DbRecordEditForm
             // 
@@ -204,11 +105,8 @@
             this.Load += new System.EventHandler(this.DbRecordEditForm_Load);
             this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.DbRecordEditForm_KeyDown);
             this.splitContainer.Panel1.ResumeLayout(false);
-            this.splitContainer.Panel1.PerformLayout();
             this.splitContainer.Panel2.ResumeLayout(false);
             this.splitContainer.ResumeLayout(false);
-            this.ListToolStrip.ResumeLayout(false);
-            this.ListToolStrip.PerformLayout();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -217,16 +115,9 @@
         #endregion
 
         protected System.Windows.Forms.SplitContainer splitContainer;
-        protected System.Windows.Forms.ListView List;
-        protected System.Windows.Forms.ColumnHeader columnHeader1;
-        protected System.Windows.Forms.ToolStrip ListToolStrip;
-        protected System.Windows.Forms.ToolStripButton btnAddRecord;
-        protected System.Windows.Forms.ToolStripButton btnRemoveRecord;
-        protected System.Windows.Forms.ToolStripDropDownButton btnRecordAdvanced;
-        protected System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
         protected System.Windows.Forms.Label lblText;
-        protected System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
         private DbRecordView RecordView;
+        private DbRecordList RecordList;
 
     }
 }

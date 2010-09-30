@@ -96,7 +96,7 @@ namespace Common.Data.Test.GUI {
         }
 
         public void InitializeWithDefaults(Object Tag) {
-            AddAssociation("1", "=> 1");
+            AddAssociation("1", "=> 1 " + DateTime.Now.ToString());
             AddAssociation("2", "=> 2");
             AddAssociation("3", "=> 3");
             AddAssociation("4", "=> 4");

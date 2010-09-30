@@ -380,7 +380,7 @@ namespace Common.Data {
                     else
                         Trace.Assert(false, "Unknown collection type.");
 
-                    AddRecordsToListViews();
+                    AddRecordsToListView();
                 } catch { }
 
             } finally {
@@ -509,7 +509,7 @@ namespace Common.Data {
         /// <summary>
         /// Adds all <see cref="SelectedRecordsList"/> to the right list view.
         /// </summary>
-        protected virtual void AddRecordsToListViews() {
+        protected virtual void AddRecordsToListView() {
             if (SelectedRecordsList != null)
                 AddRecordsToListView(SelectedRecordsList, List);
             else if (SelectedRecordsDict != null)
@@ -524,6 +524,7 @@ namespace Common.Data {
         /// <see cref="SelectedRecord"/>
         /// <see cref="PropertyName"/>
         protected virtual void ReloadData() {
+            // Reset basic properties before initializing the property reflection.
             ResetProperties();
 
             // Make sure the properties are set
