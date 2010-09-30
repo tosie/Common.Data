@@ -44,7 +44,7 @@
             this.SelectedList = new Common.Data.FasterListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.lblText = new System.Windows.Forms.Label();
-            this.cmsLinkLabels = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.SelectedListContextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -239,6 +239,7 @@
                         | System.Windows.Forms.AnchorStyles.Right)));
             this.SelectedList.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader2});
+            this.SelectedList.ContextMenuStrip = this.SelectedListContextMenu;
             this.SelectedList.FullRowSelect = true;
             this.SelectedList.GridLines = true;
             this.SelectedList.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
@@ -257,7 +258,6 @@
             this.SelectedList.DragDrop += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragDrop);
             this.SelectedList.DragEnter += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragEnter);
             this.SelectedList.KeyDown += new System.Windows.Forms.KeyEventHandler(this.SelectedList_KeyDown);
-            this.SelectedList.MouseClick += new System.Windows.Forms.MouseEventHandler(this.SelectedList_MouseClick);
             // 
             // columnHeader2
             // 
@@ -273,13 +273,10 @@
             this.lblText.TabIndex = 3;
             this.lblText.Text = "<Title>";
             // 
-            // cmsLinkLabels
+            // SelectedListContextMenu
             // 
-            this.cmsLinkLabels.Name = "cmsModels";
-            this.cmsLinkLabels.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
-            this.cmsLinkLabels.ShowCheckMargin = true;
-            this.cmsLinkLabels.ShowImageMargin = false;
-            this.cmsLinkLabels.Size = new System.Drawing.Size(61, 4);
+            this.SelectedListContextMenu.Name = "SelectedListContextMenu";
+            this.SelectedListContextMenu.Size = new System.Drawing.Size(61, 4);
             // 
             // CollectionEditForm
             // 
@@ -323,7 +320,6 @@
         protected System.Windows.Forms.ToolStripDropDownButton btnAdvanced;
         protected System.Windows.Forms.ToolStripMenuItem smiDuplicateRecord;
         protected System.Windows.Forms.Label lblText;
-        protected System.Windows.Forms.ContextMenuStrip cmsLinkLabels;
         protected System.Windows.Forms.ToolStripMenuItem smiRenameRecord;
         protected FasterListView SelectedList;
         protected System.Windows.Forms.ColumnHeader columnHeader2;
@@ -331,6 +327,7 @@
         protected System.Windows.Forms.ToolStripButton btnSelectedAddRecord;
         protected System.Windows.Forms.ToolStripButton btnSelectedRemoveRecord;
         protected System.Windows.Forms.ToolStripDropDownButton btnSelectedAdvanced;
+        private System.Windows.Forms.ContextMenuStrip SelectedListContextMenu;
 
     }
 }

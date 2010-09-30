@@ -345,6 +345,9 @@ namespace Common.Data {
                     this.SelectedList);
             }
 
+            SelectedListContextMenu.Items.Clear();
+            SelectedListContextMenu.Items.AddRange(btnSelectedAdvanced.DropDownItems);
+
             if (MenuLoading != null)
                 this.MenuLoading += MenuLoading;
         }
@@ -1240,12 +1243,6 @@ namespace Common.Data {
             if (e.KeyCode == Keys.Delete || e.KeyValue == 8) { // 8 = Backspace
                 e.Handled = true;
                 btnSelectedRemoveRecord_Click(sender, null);
-            }
-        }
-
-        private void SelectedList_MouseClick(object sender, MouseEventArgs e) {
-            if (e.Button == System.Windows.Forms.MouseButtons.Right) {
-                btnSelectedAdvanced.ShowDropDown();
             }
         }
 
