@@ -125,8 +125,7 @@ namespace Common.Data {
         /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
         public static void EditRecords(IWin32Window Owner, String Title, Type RecordType) {
             String Name = RecordType.Name;
-            List<IEditableDbRecord> Records;
-
+            
             EditRecords(Owner, Name, Title, RecordType, null);
         }
 

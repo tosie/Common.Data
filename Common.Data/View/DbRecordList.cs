@@ -8,6 +8,7 @@ using System.Text;
 using System.Windows.Forms;
 using System.Reflection;
 using System.Collections;
+using System.Diagnostics;
 
 namespace Common.Data {
     /// <summary>
@@ -16,6 +17,8 @@ namespace Common.Data {
     public partial class DbRecordList : UserControl {
 
         #region Properties / Class Variables
+
+        readonly string debug_category = "DbRecordList";
 
         /// <summary>
         /// Holds the actual user provided list of records to be shown in the list view.
@@ -35,6 +38,7 @@ namespace Common.Data {
                 if (preloadedRecords == value)
                     return;
 
+                preloadedRecords = value;
                 RefreshView();
             }
         }
@@ -73,7 +77,8 @@ namespace Common.Data {
                     createRecord = null;
                 }
 
-                RefreshView();
+                if (PreloadedRecords == null)
+                    RefreshView();
             }
         }
 
@@ -301,8 +306,11 @@ namespace Common.Data {
         /// Loads all records to be displayed list view. This is only done when <see cref="RecordType"/> is set.
         /// </summary>
         protected virtual void ReloadData() {
+            Debug.WriteLine("Reloading data ...", debug_category);
+
             // Only use the static Read method if there are no predefined records
             if (PreloadedRecords == null) {
+                Debug.WriteLine("Reading all available records ...", debug_category);
 
                 try {
                     readRecord = recordType.GetMethod(
@@ -324,6 +332,7 @@ namespace Common.Data {
                 }
 
             } else {
+                Debug.WriteLine("Showing preloaded data ...", debug_category);
 
                 Records = new List<IEditableDbRecord>(preloadedRecords.Count);
                 for (int i = 0; i < preloadedRecords.Count; i++) {
