@@ -62,6 +62,11 @@
             <param name="obj"></param>
             <returns></returns>
         </member>
+        <member name="P:Common.Configuration.GenericConfiguration.BoundObject">
+            <summary>
+            Represents the object that this configuration is bound to.
+            </summary>
+        </member>
         <member name="F:Common.Configuration.ConfigurationControl.components">
             <summary> 
             Required designer variable.

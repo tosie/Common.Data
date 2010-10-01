@@ -20,6 +20,14 @@ namespace Common.Data.Test.GUI {
             //a.Books.Add(Book.Create("Book 2"));
             //a.Update();
 
+            //for (int i = 0; i < 100; i++) {
+            //    var a = Author.Create();
+            //    a.Name = "Author " + i.ToString();
+            //    a.Books.Add(Book.Create("Book 1 of Author " + i.ToString()));
+            //    a.Books.Add(Book.Create("Book 2 or Author " + i.ToString()));
+            //    a.Update();
+            //}
+
             Author.ShowEditForm(this);
         }
 

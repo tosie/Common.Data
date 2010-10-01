@@ -485,7 +485,7 @@ namespace Common.Data {
 
         private void List_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e) {
             var record = (e.Item == null ? null : (IEditableDbRecord)e.Item.Tag);
-            SelectedRecord = record;
+            SelectedRecord = (e.IsSelected ? record : null);
             LastSelection = SelectedRecord;
         }
 

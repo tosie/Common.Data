@@ -44,6 +44,11 @@ namespace Common.Data {
         /// </summary>
         protected Boolean LoadingRecord { get; set; }
 
+        /// <summary>
+        /// Is the type of record a configuration has been created for.
+        /// </summary>
+        protected Type RecordConfigForType { get; set; }
+
         #endregion
 
         #region Constructors / Initialization
@@ -61,6 +66,7 @@ namespace Common.Data {
         /// </summary>
         protected virtual void InitializeProperties() {
             LoadingRecord = false;
+            RecordConfigForType = null;
         }
 
         #endregion
@@ -68,43 +74,30 @@ namespace Common.Data {
         #region GUI Support
 
         /// <summary>
-        /// Called whenever <see cref="SelectedRecord"/> is set.
+        /// Updates the configuration control with new data after the <see cref="SelectedRecord"/> has changed.
         /// </summary>
-        void EditSelectedRecord() {
+        /// <seealso cref="SelectedRecord"/>
+        public virtual void RefreshView() {
+
             LoadingRecord = true;
 
             try {
 
                 if (SelectedRecord == null) {
-                    Enabled = false;
-                    ConfigControl.Configuration = null;
+
+                    ConfigControl.Enabled = false;
+
                 } else {
-                    Enabled = true;
-                    RefreshView();
+
+                    LoadRecordConfiguration();
+
+                    ConfigControl.Enabled = true;
+
                 }
 
             } finally {
+
                 LoadingRecord = false;
-            }
-        }
-
-        /// <summary>
-        /// Updates the configuration control with new data after the <see cref="SelectedRecord"/> has changed.
-        /// </summary>
-        /// <seealso cref="SelectedRecord"/>
-        public virtual void RefreshView() {
-            if (SelectedRecord == null) {
-                
-                ConfigControl.Configuration = null;
-
-            } else {
-
-                var config = GenericConfiguration.CreateFor(SelectedRecord);
-                foreach (ConfigurationEntry entry in config) {
-                    entry.PropertyChanged += new PropertyChangedEventHandler(entry_PropertyChanged);
-                }
-
-                ConfigControl.Configuration = config;
 
             }
         }
@@ -113,12 +106,34 @@ namespace Common.Data {
 
         #region Data Handling
 
+        void LoadRecordConfiguration() {
+            var t = SelectedRecord.GetType();
+            if (t == RecordConfigForType && ConfigControl.Configuration != null) {
+
+                ConfigControl.Configuration.BoundObject = SelectedRecord;
+
+            } else {
+
+                // Create a configuration for the record, if that has not been done previously.
+                ConfigControl.Configuration = GenericConfiguration.CreateFor(SelectedRecord);
+                RecordConfigForType = t;
+
+                foreach (ConfigurationEntry entry in ConfigControl.Configuration) {
+                    entry.PropertyChanged += new PropertyChangedEventHandler(entry_PropertyChanged);
+                }
+
+            }
+        }
+
         /// <summary>
         /// Event handler that is called whenever a value changes.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         void entry_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+            if (LoadingRecord)
+                return;
+
             if (e.PropertyName == "Value") {
 
                 // TODO: Do not save here, bust just mark the record as dirty. Then save whenever

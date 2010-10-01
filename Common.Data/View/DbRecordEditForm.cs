@@ -127,25 +127,7 @@ namespace Common.Data {
             String Name = RecordType.Name;
             List<IEditableDbRecord> Records;
 
-            try {
-                MethodInfo read = RecordType.GetMethod(
-                    "Read",
-                    BindingFlags.Public | BindingFlags.Static,
-                    null,
-                    new Type[] { },
-                    null);
-
-                IList read_result = (IList)read.Invoke(null, null);
-
-                Records = new List<IEditableDbRecord>(read_result.Count);
-                for (int i = 0; i < read_result.Count; i++) {
-                    Records.Add((IEditableDbRecord)read_result[i]);
-                }
-            } catch {
-                Records = new List<IEditableDbRecord>();
-            }
-
-            EditRecords(Owner, Name, Title, RecordType, Records);
+            EditRecords(Owner, Name, Title, RecordType, null);
         }
 
         /// <summary>

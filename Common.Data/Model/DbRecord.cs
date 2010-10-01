@@ -7,6 +7,7 @@ using System.Diagnostics;
 using SubSonic.Repository;
 using SubSonic.SqlGeneration.Schema;
 using SubSonic.DataProviders;
+using Common.Configuration;
 
 namespace Common.Data {
     public abstract class DbRecord {
@@ -177,11 +178,20 @@ namespace Common.Data {
 
             // If not found in the cache, get it from the database
             try {
-                IList<T> instances = repository.Find<T>(i => i.Id == Id);
-                if (instances.Count <= 0)
-                    return null;
+#if DEBUG
+                using (new Profiler(text => Debug.Write(text))) {
+                    Trace.WriteLine("Reading single instance ...");
+#endif
 
-                instance = instances[0];
+                    IList<T> instances = repository.Find<T>(i => i.Id == Id);
+
+                    if (instances.Count <= 0)
+                        return null;
+
+                    instance = instances[0];
+#if DEBUG
+                }
+#endif
                 Trace.Assert(instance != null);
             } catch {
                 return null;
@@ -219,7 +229,7 @@ namespace Common.Data {
             if (repository == null)
                 repository = Repository;
 
-            // Read everything from the database, that is not already
+            // Read everything from the database that is not already
             // in the cache and ensure object consistency
             // (only do this once!)
             List<T> Cache = GetCache<T>(repository);
@@ -227,22 +237,32 @@ namespace Common.Data {
             if (!SharedObjects.Instance.Cache.ContainsKey(loaded_key)) {
                 List<Int64> ids = new List<Int64>(Cache.Count);
                 Cache.ForEach(i => ids.Add(i.Id));
-                List<T> instances = repository.All<T>().ToList();
 
-                // This cannot be done inside the query, as +ids+ is not locally available there
-                instances = instances.Where(i => !ids.Contains(i.Id)).ToList();
+#if DEBUG
+                using (new Profiler(text => Debug.Write(text))) {
+                    Debug.WriteLine("Reading all instances ...");
+#endif
 
-                // Add the new objects to the cache before running their
-                // +AfterLoad+ method, as that might read again from the
-                // database.
-                Cache.AddRange(instances);
+                    List<T> instances = repository.All<T>().ToList();
 
-                // Let the objects load themselves
-                instances.ForEach(instance => {
-                    instance.Deleted = false;
-                    instance.OwningRepository = repository;
-                    instance.AfterLoad();
-                });
+                    // This cannot be done inside the query, as +ids+ is not locally available there
+                    instances = instances.Where(i => !ids.Contains(i.Id)).ToList();
+
+                    // Add the new objects to the cache before running their
+                    // +AfterLoad+ method, as that might read again from the
+                    // database.
+                    Cache.AddRange(instances);
+
+                    // Let the objects load themselves
+                    instances.ForEach(instance => {
+                        instance.Deleted = false;
+                        instance.OwningRepository = repository;
+                        instance.AfterLoad();
+                    });
+
+#if DEBUG
+                }
+#endif
 
                 // Make sure that this gets executed only once
                 SharedObjects.Instance.Cache[loaded_key] = true;
@@ -254,6 +274,7 @@ namespace Common.Data {
             // the returned list are made to the cache as well.
             List<T> result = new List<T>(Cache.Count);
             result.AddRange(Cache);
+
             return result;
         }
 
