@@ -26,14 +26,14 @@ namespace Common.Data.Test.GUI {
         private void button2_Click(object sender, EventArgs e) {
             var columns = new DbRecordCollectionView.ColumnDefinition[] {
                 new DbRecordCollectionView.ColumnDefinition("Key.Name", "Key", 150),
-                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", -1)
+                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", -2)
             };
 
-            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, ContextMenuItems, DropDownItems, List) => {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, MenuItems, List) => {
                 // Nothing to do for now
             };
 
@@ -51,11 +51,11 @@ namespace Common.Data.Test.GUI {
                 new DbRecordCollectionView.ColumnDefinition("Name", "Name", 150),
             };
 
-            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, ContextMenuItems, DropDownItems, List) => {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, DropDownItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, MenuItems, List) => {
                 // Nothing to do for now
             };
 

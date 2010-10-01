@@ -284,16 +284,22 @@ namespace Common.Data {
 
         #region ICollection Members
 
+        /// <summary>Not implemented.</summary>
+        /// <exception cref="System.NotImplementedException">Thrown always.</exception>
         public void CopyTo(Array array, int index) {
             throw new NotImplementedException();
         }
 
+        /// <summary>Not implemented.</summary>
+        /// <exception cref="System.NotImplementedException">Thrown always.</exception>
         public bool IsSynchronized {
-            get { return false; }
+            get { throw new NotImplementedException(); }
         }
 
+        /// <summary>Not implemented.</summary>
+        /// <exception cref="System.NotImplementedException">Thrown always.</exception>
         public object SyncRoot {
-            get { return null; }
+            get { throw new NotImplementedException(); }
         }
 
         #endregion

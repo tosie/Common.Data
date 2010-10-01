@@ -8,10 +8,10 @@ set basename=Common.Data
 set outdir=Debug-Out
 
 set ilmerge="%programfiles%\Microsoft\ILMerge\ILMerge.exe"
-set ilmerge_params=/wildcards /lib:%outdir% /target:library /xmldocs
+set ilmerge_params=/wildcards /lib:%outdir% /target:library /xmldocs /zeroPeKind
 set package=Debug\Common.Data.dll
-set assemblies=Common.Data.dll SubSonic.Core.dll
-set to_delete=SubSonic.Core.dll
+set assemblies=Common.Data.dll System.Data.SQLite.dll SubSonic.Core.dll
+set to_delete=System.Data.SQLite.dll SubSonic.Core.dll
 
 if not exist %msb% goto msbuild_not_found
 goto do_build
