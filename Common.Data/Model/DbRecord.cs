@@ -302,6 +302,10 @@ namespace Common.Data {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public void Update<T>() where T : DbRecord, IDbRecord, new() {
+            // Do not update a deleted record
+            if (Deleted)
+                return;
+
             if (!(this as T).BeforeUpdate())
                 return;
 
@@ -319,6 +323,9 @@ namespace Common.Data {
 
             if (Records.Count <= 0)
                 return;
+
+            // Filter out records that have been deleted
+            Records = Records.Where(r => !r.Deleted).ToList();
 
             // Event handler
             // TODO: Add transaction support?
@@ -353,6 +360,10 @@ namespace Common.Data {
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         public Boolean Delete<T>() where T : DbRecord, IDbRecord, new() {
+            // Do not delete twice
+            if (Deleted)
+                return true;
+
             // Nested delete
             if (!(this as T).BeforeDelete())
                 return false;
