@@ -41,7 +41,7 @@ namespace Common.Data.Test.GUI {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, MenuItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, Items) => {
                 // Nothing to do for now
             };
 
@@ -63,7 +63,7 @@ namespace Common.Data.Test.GUI {
                 var tag = new object[] { Sender, DropDownItems, List };
             };
 
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, MenuItems, List) => {
+            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, Items) => {
                 // Nothing to do for now
             };
 

@@ -384,6 +384,8 @@ namespace Common.Data {
         /// Re-enabled list redrawing after a call to <see cref="BeginUpdate"/>. Call this after updating many records.
         /// </summary>
         public void EndUpdate() {
+            UpdateColumnWidths();
+
             List.EndUpdate();
         }
 
@@ -393,7 +395,7 @@ namespace Common.Data {
         /// <seealso cref="SelectedRecord"/>
         /// <seealso cref="PropertyName"/>
         public virtual void RefreshView() {
-            BeginUpdate();
+            List.BeginUpdate();
 
             try {
 
@@ -420,7 +422,7 @@ namespace Common.Data {
                 } catch { }
 
             } finally {
-                EndUpdate();
+                List.EndUpdate();
             }
         }
 
@@ -526,7 +528,8 @@ namespace Common.Data {
                 for (int i = 0; i < Columns.Length; i++) {
                     ColumnDefinition column = Columns[i];
 
-                    List.Columns.Add(column.HeaderText, column.InitialWidth);
+                    var list_column = List.Columns.Add(column.HeaderText, column.InitialWidth);
+                    list_column.Tag = column;
 
                     string property_name = column.PropertyName;
                     Type record_type = KeyType;
@@ -564,15 +567,35 @@ namespace Common.Data {
         }
 
         /// <summary>
+        /// Updates the width of the columns after the contents of the list view have changed. Only columns with an
+        /// initial width with a negative value (-1, -2) are affected, as those have a special meaning the to list
+        /// view. All other columns remain unchanged.
+        /// </summary>
+        protected virtual void UpdateColumnWidths() {
+            // Update the width of columns (only negative widths are re-applied as they have a special meaning
+            // to the list view).
+            for (int i = 0; i < List.Columns.Count; i++) {
+                var list_column = List.Columns[i];
+                var column = list_column.Tag as ColumnDefinition;
+
+                if (column.InitialWidth < 0)
+                    list_column.Width = column.InitialWidth;
+            }
+        }
+
+        /// <summary>
         /// Adds all <see cref="SelectedRecordsList"/> to the right list view.
         /// </summary>
         protected virtual void AddRecordsToListView() {
+            // Either add the HasMany<T> or the Association<TKey, TValue> records to the list.
             if (SelectedRecordsList != null)
-                AddRecordsToListView(SelectedRecordsList, List);
+                AddRecordsToListView(SelectedRecordsList, List); // HasMany<T>
             else if (SelectedRecordsDict != null)
-                AddRecordsToListView(SelectedRecordsDict, List);
+                AddRecordsToListView(SelectedRecordsDict, List); // Association<TKey, TValue>
             else
                 Trace.Assert(false, "Do not know what records to add to the list views.");
+
+            UpdateColumnWidths();
         }
 
         /// <summary>
