@@ -116,7 +116,7 @@ namespace Common.Data {
         /// <param name="Sender">Reference to the form that called this method.</param>
         /// <param name="DropDownItems">Collection of drop down menu items to show.</param>
         /// <param name="List">Reference to the list that the menu items should be associated with.</param>
-        public delegate void ContextMenuLoading(DbRecordCollectionView Sender, ToolStripItemCollection DropDownItems, ListView List);
+        public delegate void ContextMenuLoading(DbRecordCollectionView Sender, ToolStripItemCollection Items);
 
         /// <summary>
         /// Enumeration of all supported collection types
@@ -152,6 +152,8 @@ namespace Common.Data {
         #endregion
 
         #region Properties / Class Variables
+
+        static readonly string debug_category = "DbRecordCollectionView";
 
         /// <summary>
         /// Reference to the currently selected record. <seealso cref="SelectedRecord"/>.
@@ -277,10 +279,25 @@ namespace Common.Data {
         /// <param name="MenuLoading">A method that is called everytime before a context menu is opened.</param>
         public virtual void PrepareControl(String PropertyName, ColumnDefinition[] Columns,
                 ContextMenuInitializer MenuInitiliazer, ContextMenuLoading MenuLoading) {
+            // Setup basic properties.
             this.PropertyName = PropertyName;
             this.Columns = Columns;
 
-            // Initialize the context menu.
+            // Initialize the context and drop down menus.
+            InitializeMenus(MenuInitiliazer, MenuLoading);
+        }
+
+        #endregion
+
+        #region GUI Support
+
+        /// <summary>
+        /// If passed, the menu initializer handler (<paramref name="MenuInitializer"/>) will be called so that the context and drop down menus can be loaded with items. The "advanced button" will be shown only when the drop down menu contains at least one item. Furthermore, the <paramref name="MenuLoading"/> event handler is initialized.
+        /// </summary>
+        /// <param name="MenuInitiliazer"></param>
+        /// <param name="MenuLoading"></param>
+        void InitializeMenus(ContextMenuInitializer MenuInitiliazer, ContextMenuLoading MenuLoading) {
+            // If there is a menu initializer handler, call it.
             if (MenuInitiliazer != null) {
                 MenuInitiliazer(
                     this,
@@ -291,34 +308,18 @@ namespace Common.Data {
 
             // Workaround for setting and retrieving the visibility of the buttons.
             // See the comment at http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstripitem.visible.aspx.
-            bool add_visible = false; // TODO
-            bool remove_visible = false; // TODO
             bool advanced_visible = (btnAdvanced.DropDownItems.Count > 0);
-
-            btnAddRecord.Visible = add_visible;
-            btnRemoveRecord.Visible = remove_visible;
 
             // Make sure the advanced button is only visible if it has drop down items.
             btnAdvanced.Visible = advanced_visible;
 
             // If there is no visible button on the tool strip, hide it.
-            bool toolstrip_visible = add_visible
-                || remove_visible
-                || advanced_visible;
-            ToolStrip.Visible = toolstrip_visible;
-
-            // If the tool strip itself is not visible, increase the height of the list view.
-            if (!toolstrip_visible)
-                List.Height = Height - List.Margin.Top - List.Margin.Bottom;
+            UpdateToolbarVisibility();
 
             // Register an event handler that gets called every time the context menu opens.
             if (MenuLoading != null)
                 this.MenuLoading += MenuLoading;
         }
-
-        #endregion
-
-        #region GUI Support
 
         /// <summary>
         /// Called whenever <see cref="SelectedRecord"/> is set.
@@ -341,13 +342,30 @@ namespace Common.Data {
             var record_selected = SelectedRecord != null;
 
             foreach (ToolStripMenuItem item in items) {
-                if (item.Tag == null || !(item.Tag is String))
+                Debug.WriteLine(String.Format("[SetStateOfMenuItems] Processing menu item {0} ...", item.Text), debug_category);
+
+                var condition = "";
+                if (item.Tag is string) {
+                    condition = (item.Tag as string);
+                    Debug.WriteLine(String.Format("[SetStateOfMenuItems] Tag is string, new condition = {0}.", condition), debug_category);
+                } else if (item.Tag is object[] && (item.Tag as object[]).Length >= 1 && (item.Tag as object[])[0] is string) {
+                    condition = (item.Tag as object[])[0] as string;
+                    Debug.WriteLine(String.Format("[SetStateOfMenuItems] Tag is object[] with [0] as string, new condition = {0}.", condition), debug_category);
+                } else {
+                    Debug.WriteLine(String.Format("[SetStateOfMenuItems] No new condition detected.", condition), debug_category);
+                }
+
+                if (String.IsNullOrEmpty(condition))
                     continue;
 
-                switch ((String)item.Tag) {
+                switch (condition) {
                     case "SelectedRecord != null":
-                        // Enable if something in the left list view is selected
+                        // Enable if there is an owning record.
                         item.Enabled = record_selected;
+                        break;
+                    case "SelectedCollectionItems.Count > 0":
+                        // Enable if something from the collection has been selected.
+                        item.Enabled = SelectedCollectionItems.Count > 0;
                         break;
                     default:
                         break;
@@ -404,6 +422,27 @@ namespace Common.Data {
             } finally {
                 EndUpdate();
             }
+        }
+
+        /// <summary>
+        /// Shows/Hides the toolbar according to the visibility of all its buttons. If no button is visible, the toolbar is hidden and the list view's height is increased.
+        /// </summary>
+        protected virtual void UpdateToolbarVisibility() {
+            // Workaround for setting and retrieving the visibility of the buttons.
+            // See the comment at http://msdn.microsoft.com/en-us/library/system.windows.forms.toolstripitem.visible.aspx.
+            bool add_visible = btnAddRecord.Visible;
+            bool remove_visible = btnRemoveRecord.Visible;
+            bool advanced_visible = btnAdvanced.Visible;
+
+            // If there is no visible button on the tool strip, hide it.
+            bool toolstrip_visible = add_visible
+                || remove_visible
+                || advanced_visible;
+            ToolStrip.Visible = toolstrip_visible;
+
+            // If the tool strip itself is not visible, increase the height of the list view.
+            if (!toolstrip_visible)
+                List.Height = Height - List.Margin.Top - List.Margin.Bottom;
         }
 
         #endregion
@@ -916,14 +955,14 @@ namespace Common.Data {
             SetStateOfMenuItems(btnAdvanced.DropDownItems);
 
             if (MenuLoading != null)
-                MenuLoading(this, btnAdvanced.DropDownItems, List);
+                MenuLoading(this, btnAdvanced.DropDownItems);
         }
 
         private void contextMenu_Opening(object sender, CancelEventArgs e) {
             SetStateOfMenuItems(contextMenu.Items);
 
             if (MenuLoading != null)
-                MenuLoading(this, contextMenu.Items, List);
+                MenuLoading(this, contextMenu.Items);
         }
 
         private void btnAddRecord_Click(object sender, EventArgs e) {
