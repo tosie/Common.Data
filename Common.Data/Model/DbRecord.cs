@@ -180,7 +180,7 @@ namespace Common.Data {
             try {
 #if DEBUG
                 using (new Profiler(text => Debug.Write(text))) {
-                    Trace.WriteLine("Reading single instance ...");
+                    Debug.WriteLine(String.Format("Reading single instance of {0} with Id = {1} ...", typeof(T), Id));
 #endif
 
                     IList<T> instances = repository.Find<T>(i => i.Id == Id);
@@ -240,7 +240,7 @@ namespace Common.Data {
 
 #if DEBUG
                 using (new Profiler(text => Debug.Write(text))) {
-                    Debug.WriteLine("Reading all instances ...");
+                    Debug.WriteLine(String.Format("Reading all instances of {0} ...", typeof(T)));
 #endif
 
                     List<T> instances = repository.All<T>().ToList();
