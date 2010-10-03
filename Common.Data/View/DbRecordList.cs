@@ -192,7 +192,7 @@ namespace Common.Data {
         /// <summary>
         /// Select a list item from the left list view.
         /// </summary>
-        /// <param name="Record">The item to be selected.</param>
+        /// <param name="Item">The item to be selected.</param>
         /// <param name="EnsureVisibility">Make the list view item visible?</param>
         /// <param name="EditAfterSelect">Start editing the name of the record associated with the list item after selecting it?</param>
         void SelectRecord(ListViewItem Item, Boolean EnsureVisibility, Boolean EditAfterSelect) {

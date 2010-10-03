@@ -229,7 +229,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="OwningRecords"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecords"/> property.
+        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="OwningRecord"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="SelectedRecords"/> property.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">Thrown when SelectedRecords, Property or HasManyType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
         /// <exception cref="System.MemberAccessException">Thrown when the HasManyType does not contain

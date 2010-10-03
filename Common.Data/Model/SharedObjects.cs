@@ -53,7 +53,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Lookup the given Connection String in the App.config and call the overloaded <see cref="OpenRepository"/> method
+        /// Lookup the given Connection String in the App.config and call the overloaded OpenRepository method
         /// with the connection string and provider name as set in the config file.
         /// </summary>
         /// <param name="ConnectionString">Key of the connection string to use as defined in the app.config.</param>
@@ -93,7 +93,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Executes the VACUUM command on all repositories that are marked using the <see cref="NeedVacuum"/> property.
+        /// Executes the VACUUM command on all repositories that are marked using the <see cref="NeedsVacuum"/> property.
         /// </summary>
         public void VacuumRepositories() {
             foreach (var kv in NeedsVacuum) {

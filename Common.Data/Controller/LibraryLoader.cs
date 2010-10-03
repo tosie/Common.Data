@@ -35,7 +35,6 @@ namespace Common.Data {
         /// 
         /// If the function fails, the return value is NULL. To get extended error information, call GetLastError.
         /// </returns>
-        /// <seealso cref=""/>
         [DllImport("kernel32")]
         public extern static int LoadLibrary(string librayName);
 

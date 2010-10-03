@@ -49,6 +49,7 @@
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Configuration, Version=1.0.0.0, Culture=neutral, PublicKeyToken=b28fc23199437cda, processorArchitecture=MSIL" />
     <Reference Include="SubSonic.Core">
       <HintPath>..\Common.Data\lib\SubSonic.Core.dll</HintPath>
     </Reference>

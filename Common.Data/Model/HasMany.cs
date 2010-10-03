@@ -154,9 +154,9 @@ namespace Common.Data {
         #region List Members
 
         /// <summary>
-        /// Performs the specified action on each element of the System.Collections.Generic.List<T>.
+        /// Performs the specified action on each element of the System.Collections.Generic.List&lt;T&gt;.
         /// </summary>
-        /// <param name="action">The System.Action<T> delegate to perform on each element of the System.Collections.Generic.List<T>.</param>
+        /// <param name="action">The System.Action&lt;T&gt; delegate to perform on each element of the System.Collections.Generic.List&lt;T&gt;.</param>
         public void ForEach(Action<T> action) {
             Data.ForEach(action);
         }

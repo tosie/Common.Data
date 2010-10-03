@@ -10,6 +10,12 @@ using SubSonic.DataProviders;
 using Common.Configuration;
 
 namespace Common.Data {
+    /// <summary>
+    /// Provides basic methods for working with database objects.
+    /// </summary>
+    /// <remarks>
+    /// Define DBRECORD_DEBUG, to see debug messages.
+    /// </remarks>
     public abstract class DbRecord {
 
         #region Properties
@@ -153,7 +159,6 @@ namespace Common.Data {
         /// and saves it to the database.
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="repository"></param>
         /// <returns></returns>
         public static T Create<T>() where T : DbRecord, IDbRecord, new() {
             return Create<T>(Repository, null);
@@ -178,7 +183,7 @@ namespace Common.Data {
 
             // If not found in the cache, get it from the database
             try {
-#if DEBUG
+#if DBRECORD_DEBUG
                 using (new Profiler(text => Debug.Write(text))) {
                     Debug.WriteLine(String.Format("Reading single instance of {0} with Id = {1} ...", typeof(T), Id));
 #endif
@@ -189,10 +194,10 @@ namespace Common.Data {
                         return null;
 
                     instance = instances[0];
-#if DEBUG
+#if DBRECORD_DEBUG
                 }
 #endif
-                Trace.Assert(instance != null);
+                    Trace.Assert(instance != null);
             } catch {
                 return null;
             }
@@ -238,7 +243,7 @@ namespace Common.Data {
                 List<Int64> ids = new List<Int64>(Cache.Count);
                 Cache.ForEach(i => ids.Add(i.Id));
 
-#if DEBUG
+#if DBRECORD_DEBUG
                 using (new Profiler(text => Debug.Write(text))) {
                     Debug.WriteLine(String.Format("Reading all instances of {0} ...", typeof(T)));
 #endif
@@ -260,11 +265,11 @@ namespace Common.Data {
                         instance.AfterLoad();
                     });
 
-#if DEBUG
+#if DBRECORD_DEBUG
                 }
 #endif
 
-                // Make sure that this gets executed only once
+                    // Make sure that this gets executed only once
                 SharedObjects.Instance.Cache[loaded_key] = true;
             }
 

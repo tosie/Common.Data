@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SubSonic.SqlGeneration.Schema;
+using Common.Configuration;
 
 namespace Common.Data.Test.GUI {
     public class Author : DbRecord, IEditableDbRecord {
@@ -13,6 +14,8 @@ namespace Common.Data.Test.GUI {
         [SubSonicNullString]
         public string Name { get; set; }
 
+        [DbRecordCollectionView.Column(1, "Key.Name", "Key", -2)]
+        [DbRecordCollectionView.Column(2, "Value.Name", "Value", -2)]
         [SubSonicIgnore]
         public Association<AssocKey, AssocValue> Associations { get; set; }
 
@@ -25,6 +28,9 @@ namespace Common.Data.Test.GUI {
 
         #endregion
 
+        [Configuration("Bücher", 10,
+            ControlType = ConfigurationEntry.ControlTypes.None)]
+        [DbRecordCollectionView.Column(1, "Key.Name", "Buch", -1)]
         [SubSonicIgnore]
         public HasMany<Book> Books { get; set; }
 
@@ -36,6 +42,10 @@ namespace Common.Data.Test.GUI {
         }
 
         #endregion
+
+        [Configuration("ConfigTest for Author", 10,
+            ControlType = ConfigurationEntry.ControlTypes.TextBox)]
+        public string ConfigTest { get; set; }
 
         #endregion
 

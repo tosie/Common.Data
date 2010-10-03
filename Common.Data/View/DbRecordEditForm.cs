@@ -93,6 +93,7 @@ namespace Common.Data {
             InitializeComponent();
         }
 
+        /// <summary>Initializes the form's basic properties. Call this before showing the form.</summary>
         /// <param name="Owner">Window that is the owner of the form that is shown</param>
         /// <param name="Name">Name to use for the edit window (think user preferences = FormData)</param>
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
@@ -184,7 +185,7 @@ namespace Common.Data {
         }
 
         private void RecordList_RecordSelected(Control sender, RecordEventArgs e) {
-            RecordView.SelectedRecord = e.Record;
+            RecordView.SelectedRecord = e.Record as IEditableDbRecord;
 
             var args = RecordEvent.Fire(this, RecordSelected, e.Record);
             e.CopyFrom(args);

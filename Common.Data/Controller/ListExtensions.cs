@@ -13,7 +13,6 @@ namespace Common.Data {
         /// <typeparam name="FROM_TYPE"></typeparam>  
         /// <typeparam name="TO_TYPE"></typeparam>  
         /// <param name="listToCopyFrom"></param>  
-        /// <param name="listToCopyTo"></param>  
         /// <returns></returns>  
         public static List<TO_TYPE> ConvertTo<FROM_TYPE, TO_TYPE>(List<FROM_TYPE> listToCopyFrom) where FROM_TYPE : TO_TYPE {
             if (listToCopyFrom == null)

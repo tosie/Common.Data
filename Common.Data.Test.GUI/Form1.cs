@@ -32,48 +32,22 @@ namespace Common.Data.Test.GUI {
         }
 
         private void button2_Click(object sender, EventArgs e) {
-            var columns = new DbRecordCollectionView.ColumnDefinition[] {
-                new DbRecordCollectionView.ColumnDefinition("Key.Name", "Key", 150),
-                new DbRecordCollectionView.ColumnDefinition("Value.Name", "Value", -2)
-            };
-
-            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, ContextMenuItems, DropDownItems, List) => {
-                var tag = new object[] { Sender, DropDownItems, List };
-            };
-
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, Items) => {
-                // Nothing to do for now
-            };
-
             CollectionEditForm.EditRecords(this,
                 "Title",
                 typeof(Author),
-                "Associations",
-                columns,
-                null,
-                null);
+                "Associations");
         }
 
         private void button3_Click(object sender, EventArgs e) {
-            var columns = new DbRecordCollectionView.ColumnDefinition[] {
-                new DbRecordCollectionView.ColumnDefinition("Name", "Name", 150),
-            };
-
-            DbRecordCollectionView.ContextMenuInitializer menuinit = (Sender, ContextMenuItems, DropDownItems, List) => {
-                var tag = new object[] { Sender, DropDownItems, List };
-            };
-
-            DbRecordCollectionView.ContextMenuLoading menuload = (Sender, Items) => {
-                // Nothing to do for now
-            };
-
             CollectionEditForm.EditRecords(this,
                 "Title",
                 typeof(Author),
-                "Books",
-                columns,
-                null,
-                null);
+                "Books");
+        }
+
+        private void button4_Click(object sender, EventArgs e) {
+            var authors = Author.Read().Select(a => (IEditableDbRecord)a).ToList();
+            TreeViewForm.EditRecords(this, "Author", "Autoren bearbeiten", authors);
         }
     }
 }

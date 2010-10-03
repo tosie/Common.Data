@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using SubSonic.SqlGeneration.Schema;
+using Common.Configuration;
 
 namespace Common.Data.Test.GUI {
     public class Book : DbRecord, IEditableDbRecord {
@@ -12,6 +13,10 @@ namespace Common.Data.Test.GUI {
 
         [SubSonicNullString]
         public string Name { get; set; }
+
+        [Configuration("ConfigTest for Book", 10,
+            ControlType = ConfigurationEntry.ControlTypes.TextBox)]
+        public string ConfigTest { get; set; }
 
         #endregion
 

@@ -100,13 +100,7 @@ namespace Common.Data {
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
         /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
         /// <param name="PropertyName">Name of the property of the RecordType class, that represents the HasMany&lt;T&gt; relation</param>
-        /// <param name="Columns">The column definitions to use for the right list view.</param>
-        /// <param name="MenuInitiliazer">A method that is called once to initialize a context menu.</param>
-        /// <param name="MenuLoading">A method that is called everytime before a context menu is opened.</param>
-        protected virtual void InitializeForm(String Title, Type RecordType,
-                String PropertyName, DbRecordCollectionView.ColumnDefinition[] Columns,
-                DbRecordCollectionView.ContextMenuInitializer MenuInitiliazer,
-                DbRecordCollectionView.ContextMenuLoading MenuLoading) {
+        protected virtual void InitializeForm(String Title, Type RecordType, String PropertyName) {
             // Important for FormData.LoadFormData and FormData.SaveFormData
             string Name = RecordType.Name;
             this.Name = Name;
@@ -116,7 +110,7 @@ namespace Common.Data {
 
             RecordList.RecordType = RecordType;
 
-            Collection.PrepareControl(PropertyName, Columns, MenuInitiliazer, MenuLoading);
+            Collection.PropertyName = PropertyName;
         }
 
         #endregion
@@ -130,15 +124,9 @@ namespace Common.Data {
         /// <param name="Title">Text to show in the form's title bar and a caption label</param>
         /// <param name="RecordType">The type of the DbRecord subclass to show the form for</param>
         /// <param name="PropertyName">Name of the property of the RecordType class, that represents the HasMany&lt;T&gt; relation</param>
-        /// <param name="Columns">The column definitions to use for the right list view.</param>
-        /// <param name="MenuInitiliazer">A method that is called once to initialize a context menu.</param>
-        /// <param name="MenuLoading">A method that is called everytime before a context menu is opened.</param>
-        public static void EditRecords(IWin32Window Owner, String Title, Type RecordType,
-                String PropertyName, DbRecordCollectionView.ColumnDefinition[] Columns,
-                DbRecordCollectionView.ContextMenuInitializer MenuInitiliazer,
-                DbRecordCollectionView.ContextMenuLoading MenuLoading) {
+        public static void EditRecords(IWin32Window Owner, String Title, Type RecordType, String PropertyName) {
             using (var form = new CollectionEditForm()) {
-                form.InitializeForm(Title, RecordType, PropertyName, Columns, MenuInitiliazer, MenuLoading);
+                form.InitializeForm(Title, RecordType, PropertyName);
 
                 if (Owner == null)
                     form.ShowInTaskbar = true;
@@ -192,8 +180,6 @@ namespace Common.Data {
         }
 
         #endregion
-
-        
 
     }
 }
