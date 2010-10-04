@@ -48,6 +48,7 @@
             this.ToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.ToolStrip.Size = new System.Drawing.Size(235, 28);
             this.ToolStrip.TabIndex = 5;
+            this.ToolStrip.Visible = false;
             // 
             // btnAddRecord
             // 
@@ -108,7 +109,7 @@
             this.Tree.Location = new System.Drawing.Point(3, 3);
             this.Tree.Name = "Tree";
             this.Tree.ShowNodeToolTips = true;
-            this.Tree.Size = new System.Drawing.Size(229, 291);
+            this.Tree.Size = new System.Drawing.Size(229, 319);
             this.Tree.TabIndex = 6;
             this.Tree.BeforeLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.Tree_BeforeLabelEdit);
             this.Tree.AfterLabelEdit += new System.Windows.Forms.NodeLabelEditEventHandler(this.Tree_AfterLabelEdit);
