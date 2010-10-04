@@ -14,19 +14,16 @@ namespace Common.Data {
 
         #region Data Structures
 
-        /// <summary>
-        /// Enumeration of all supported collection types
-        /// </summary>
+        /// <summary>Enumeration of all supported collection types.</summary>
         public enum CollectionType {
-            /// <summary>
-            /// The collection is of the HasMany&lt;T&gt; type;
-            /// </summary>
+            /// <summary>The collection is of the HasMany&lt;T&gt; type.</summary>
             HasMany,
             
-            /// <summary>
-            /// The collection is of the Association&lt;TKey, TValue&gt; type;
-            /// </summary>
-            Association
+            /// <summary>The collection is of the Association&lt;TKey, TValue&gt; type.</summary>
+            Association,
+
+            /// <summary>The collection is of the AssociationWithValue&lt;TFrom, TTo&gt; type.</summary>
+            AssociationWithValue
         }
 
         /// <summary>
@@ -34,7 +31,8 @@ namespace Common.Data {
         /// </summary>
         internal static readonly Dictionary<String, CollectionType> CollectionTypeNames = new Dictionary<String, CollectionType>() {
             { "Common.Data.HasMany`1", CollectionType.HasMany },
-            { "Common.Data.Association`2", CollectionType.Association }
+            { "Common.Data.Association`2", CollectionType.Association },
+            { "Common.Data.AssociationWithValue`2", CollectionType.AssociationWithValue }
         };
 
         /// <summary>
@@ -42,7 +40,8 @@ namespace Common.Data {
         /// </summary>
         internal static readonly Dictionary<CollectionType, Int32> CollectionTypeArguments = new Dictionary<CollectionType, Int32>() {
             { CollectionType.HasMany, 1 },
-            { CollectionType.Association, 2 }
+            { CollectionType.Association, 2 },
+            { CollectionType.AssociationWithValue, 2 }
         };
 
         #endregion
@@ -88,14 +87,14 @@ namespace Common.Data {
 
         /// <summary>
         /// If the type of the property is HasMany&lt;T&gt;, this contains the type of T.
-        /// If the property is an Association&lt;TKey, TValue&gt;, this contains the type of TKey.
+        /// If the property is an Association&lt;TKey, TValue&gt; or AssociationWithValue&lt;TFrom, TTo&gt;, this contains the type of TKey.
         /// </summary>
         /// <see cref="InitializePropertyReflection"/>
         public virtual Type KeyType { get; protected set; }
 
         /// <summary>
         /// If the type of the property is HasMany&lt;T&gt;, this is null.
-        /// If the property is an Association&lt;TKey, TValue&gt;, this contains the type of TValue.
+        /// If the property is an Association&lt;TKey, TValue&gt; or AssociationWithValue&lt;TFrom, TTo&gt;, this contains the type of TValue.
         /// </summary>
         /// <see cref="InitializePropertyReflection"/>
         public virtual Type ValueType { get; protected set; }
@@ -109,6 +108,11 @@ namespace Common.Data {
         /// Holds all records associated with the <see cref="Record"/> via the <see cref="PropertyName"/>, if the property name corresponds with an Association&gt;TKey, TValue&lt; collection.
         /// </summary>
         public Dictionary<IDbRecord, IDbRecord> CollectionDictionary { get; protected set; }
+
+        /// <summary>
+        /// Holds all records associated with the <see cref="Record"/> via the <see cref="PropertyName"/>, if the property name corresponds with an AssociationWithValue&gt;TKey, TValue&lt; collection.
+        /// </summary>
+        public Dictionary<IDbRecord, Dictionary<IDbRecord, string>> CollectionDictionaryWithValues { get; protected set; }
 
         /// <summary>
         /// Determines whether the elements in the collections can be rearranged. Depends on <see cref="PropertyCollectionType"/>.
@@ -179,6 +183,7 @@ namespace Common.Data {
             ValueType = null;
             CollectionList = null;
             CollectionDictionary = null;
+            CollectionDictionaryWithValues = null;
         }
 
         /// <summary>
@@ -212,7 +217,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Updates the list views with new data after the <see cref="Record"/> or <see cref="PropertyName"/> have changed.
+        /// Updates the abstract list (or dictionary) with new data after the <see cref="Record"/> or <see cref="PropertyName"/> have changed.
         /// </summary>
         /// <see cref="Record"/>
         /// <see cref="PropertyName"/>
@@ -220,7 +225,7 @@ namespace Common.Data {
             // Reset basic properties before initializing the property reflection.
             ResetProperties();
 
-            // Make sure the properties are set
+            // Make sure the properties are set.
             if (Record == null || String.IsNullOrEmpty(PropertyName))
                 return;
 
@@ -228,12 +233,46 @@ namespace Common.Data {
             InitializePropertyReflection();
 
             // Get a list of all records that are contained in the collection.
-            if (PropertyCollectionType == CollectionType.HasMany)
-                LoadListCollectionData();
-            else if (PropertyCollectionType == CollectionType.Association)
-                LoadDictionaryCollectionData();
-            else
-                Trace.Assert(false, "Unknown collection type.");
+            switch (PropertyCollectionType) {
+                case CollectionType.HasMany:
+                    LoadListCollectionData();
+                    break;
+                case CollectionType.Association:
+                    LoadDictionaryCollectionData();
+                    break;
+                case CollectionType.AssociationWithValue:
+                    LoadDictionaryCollectionWithValuesData();
+                    break;
+                default:
+                    Trace.Assert(false, "Unknown collection type.");
+                    break;
+            }
+                
+        }
+
+        /// <summary>
+        /// Writes the abstract list (or dictionary) back to the original collection as set by <see cref="Record"/> and <see cref="PropertyName"/>.
+        /// </summary>
+        public virtual void SaveData() {
+            // Make sure the properties are set.
+            if (Record == null || String.IsNullOrEmpty(PropertyName))
+                return;
+
+            // Save the orignal collections ...
+            switch (PropertyCollectionType) {
+                case CollectionType.HasMany:
+                    SaveListCollectionData();
+                    break;
+                case CollectionType.Association:
+                    SaveDictionaryCollectionData();
+                    break;
+                case CollectionType.AssociationWithValue:
+                    SaveDictionaryCollectionWithValuesData();
+                    break;
+                default:
+                    Trace.Assert(false, "Unknown collection type.");
+                    break;
+            }
         }
 
         #endregion
@@ -247,7 +286,7 @@ namespace Common.Data {
         /// <param name="List">The list to which to add the items</param>
         /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
         /// <exception cref="System.ArgumentException">Thrown when the passed object does not implement the IList interface.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when the list of items passed as anonymous object contains elements that cannot be cast to the DbRecord class.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the list of items passed as anonymous object contains elements that cannot be cast to the IDbRecord interface.</exception>
         protected virtual void AnonymousObjectToDbRecordList(object Obj, IList<IDbRecord> List) {
             if (Obj == null)
                 throw new ArgumentNullException("Obj");
@@ -297,6 +336,39 @@ namespace Common.Data {
             AnonymousObjectToDbRecordList(list, CollectionList);
         }
 
+        /// <summary>
+        /// Saves the list of all records in the HasMany&lt;T&gt; collection specified by <see cref="Record"/> and <see cref="PropertyName"/>. The source is <see cref="CollectionList"/>.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property or KeyType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when the KeyType does not contain a static method named "Read".</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the Property's type does not implement the IList interface.</exception>
+        protected virtual void SaveListCollectionData() {
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            // Invoke the property's get method
+            object list = null;
+            try {
+                list = Property.GetValue(Record, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the HasMany set.", ex);
+            }
+
+            if (list == null)
+                return;
+
+            if (!(list is IList))
+                throw new ArgumentException("The given property is not of an IList type.", "Property");
+
+            (list as IList).Clear();
+            for (int i = 0; i < CollectionList.Count; i++) {
+                (list as IList).Add(CollectionList[i]);
+            }
+        }
+
         #endregion
 
         #region Data Handling (Collection: Association<TKey, TValue>)
@@ -308,7 +380,7 @@ namespace Common.Data {
         /// <param name="Dictionary">The dictionary to which to add the items</param>
         /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
         /// <exception cref="System.ArgumentException">Thrown when the passed object does not implement the IDictionary interface.</exception>
-        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items passed as anonymous object contains elements that cannot be cast to the DbRecord class.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items passed as anonymous object contains elements that cannot be cast to the IDbRecord interface.</exception>
         protected virtual void AnonymousObjectToDbRecordDict(object Obj, Dictionary<IDbRecord, IDbRecord> Dictionary) {
             if (Obj == null)
                 throw new ArgumentNullException("Obj");
@@ -319,8 +391,6 @@ namespace Common.Data {
             if (!(Obj is IDictionary))
                 throw new ArgumentException("The given object is not of an IDictionary type.", "Obj");
 
-            int count = ((IDictionary)Obj).Count;
-
             Dictionary.Clear();
 
             foreach (var key in ((IDictionary)Obj).Keys) {
@@ -329,7 +399,7 @@ namespace Common.Data {
         }
 
         /// <summary>
-        /// Retrieves a list of all records in the HasMany&lt;T&gt; collection as specified by <see cref="CollectionList"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="CollectionList"/> property.
+        /// Retrieves a list of all records in the Association&lt;TKey, TValue&gt; collection as specified by <see cref="CollectionList"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="CollectionList"/> property.
         /// </summary>
         /// <exception cref="System.ArgumentNullException">Thrown when Property, KeyType or ValueType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
         /// <exception cref="System.MemberAccessException">Thrown when neither the KeyType nor the ValueType contain a static method named "Read".</exception>
@@ -358,6 +428,158 @@ namespace Common.Data {
                 return;
 
             AnonymousObjectToDbRecordDict(dict, CollectionDictionary);
+        }
+
+        /// <summary>
+        /// Saves all associations back to the <see cref="Record"/>'s property names <see cref="PropertyName"/>. The source is <see cref="CollectionDictionary"/>.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property, KeyType or ValueType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when neither the KeyType nor the ValueType contain a static method named "Read".</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the Property's type does not implement the IDictionary interface.</exception>
+        protected virtual void SaveDictionaryCollectionData() {
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            if (ValueType == null)
+                throw new ArgumentNullException("ValueType");
+
+            // Invoke the property's get method
+            object dictionary = null;
+            try {
+                dictionary = Property.GetValue(Record, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the Association relation.", ex);
+            }
+
+            if (dictionary == null)
+                return;
+
+            if (!(dictionary is IDictionary))
+                throw new ArgumentException("The given property is not of an IDictionary type.", "Property");
+
+            (dictionary as IDictionary).Clear();
+            foreach (KeyValuePair<IDbRecord, IDbRecord> kv in CollectionDictionary) {
+                (dictionary as IDictionary).Add(kv.Key, kv.Value);
+            }
+        }
+
+        #endregion
+
+        #region Data Handling (Collection: AssociationWithValue<TFrom, TTo>)
+
+        /// <summary>
+        /// Converts an anonymous object that implements the IDictionary interface to a dictionary of IDbRecords with values.
+        /// </summary>
+        /// <param name="Obj">The anonymous object</param>
+        /// <param name="Dictionary">The dictionary to which to add the items</param>
+        /// <exception cref="System.ArgumentNullException">Thrown when one of the input parameters is null.</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the passed object does not implement the IDictionary interface.</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items passed as anonymous object contains elements that cannot be cast to the IDbRecord interface.</exception>
+        protected virtual void AnonymousObjectToDbRecordDict(object Obj, Dictionary<IDbRecord, Dictionary<IDbRecord, string>> Dictionary) {
+            if (Obj == null)
+                throw new ArgumentNullException("Obj");
+
+            if (Dictionary == null)
+                throw new ArgumentNullException("Dictionary");
+
+            if (!(Obj is IDictionary))
+                throw new ArgumentException("The given object is not of an IDictionary<IDbRecord, IDictionary<IDbRecord, string>> type.", "Obj");
+
+            Dictionary.Clear();
+
+            foreach (var from in ((IDictionary)Obj).Keys) {
+                if (!Dictionary.ContainsKey(from as IDbRecord))
+                    Dictionary[from as IDbRecord] = new Dictionary<IDbRecord, string>();
+
+                if (!(((IDictionary)Obj)[from] is IDictionary))
+                    throw new ArgumentException("The given object is not of an IDictionary<IDbRecord, IDictionary<IDbRecord, string>> type.", "Obj");
+
+                var from_dict = (IDictionary)((IDictionary)Obj)[from];
+                foreach (DictionaryEntry kv in from_dict) {
+                    var to = kv.Key;
+                    var value = kv.Value;
+                    Dictionary[from as IDbRecord][to as IDbRecord] = value as string;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a list of all records in the AssociationWithValue&lt;TFrom, TTo&gt; collection as specified by <see cref="CollectionList"/> and <see cref="PropertyName"/>. The result is stored in the <see cref="CollectionList"/> property.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property, KeyType or ValueType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when neither the KeyType nor the ValueType contain a static method named "Read".</exception>
+        /// <exception cref="System.InvalidCastException">Thrown when the dictionary of items contained in the Association set (see <see cref="Record"/> and <see cref="PropertyName"/>) contains elements that cannot be cast to the DbRecord class.</exception>
+        protected virtual void LoadDictionaryCollectionWithValuesData() {
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            if (ValueType == null)
+                throw new ArgumentNullException("ValueType");
+
+            CollectionDictionaryWithValues = new Dictionary<IDbRecord, Dictionary<IDbRecord, string>>();
+
+            // Invoke the property's get method
+            object dict = null;
+            try {
+                dict = Property.GetValue(Record, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the Association set.", ex);
+            }
+
+            if (dict == null)
+                return;
+
+            AnonymousObjectToDbRecordDict(dict, CollectionDictionaryWithValues);
+        }
+
+        /// <summary>
+        /// Saves all associations with values back to the <see cref="Record"/>'s property names <see cref="PropertyName"/>. The source is <see cref="CollectionDictionaryWithValues"/>.
+        /// </summary>
+        /// <exception cref="System.ArgumentNullException">Thrown when Property, KeyType or ValueType are null (see <see cref="ResetProperties"/> and <see cref="InitializePropertyReflection"/>.)</exception>
+        /// <exception cref="System.MemberAccessException">Thrown when neither the KeyType nor the ValueType contain a static method named "Read".</exception>
+        /// <exception cref="System.ArgumentException">Thrown when the Property's type does not implement the IDictionary interface.</exception>
+        protected virtual void SaveDictionaryCollectionWithValuesData() {
+            if (Property == null)
+                throw new ArgumentNullException("Property");
+
+            if (KeyType == null)
+                throw new ArgumentNullException("KeyType");
+
+            if (ValueType == null)
+                throw new ArgumentNullException("ValueType");
+
+            // Invoke the property's get method
+            object from_dict = null;
+            try {
+                from_dict = Property.GetValue(Record, null);
+            } catch (Exception ex) {
+                throw new MemberAccessException("Could not get the Association relation.", ex);
+            }
+
+            if (from_dict == null)
+                return;
+
+            if (!(from_dict is IDictionary))
+                throw new ArgumentException("The given property is not of an IDictionary type.", "Property");
+
+            foreach (KeyValuePair<IDbRecord, Dictionary<IDbRecord, string>> kv in CollectionDictionaryWithValues) {
+                var from = kv.Key;
+
+                var to_dict = (from_dict as IDictionary)[from];
+
+                foreach (KeyValuePair<IDbRecord, string> kv2 in CollectionDictionaryWithValues[from]) {
+                    var to = kv2.Key;
+                    var value = kv2.Value;
+
+                    (to_dict as IDictionary)[to] = value;
+                }
+            }
         }
 
         #endregion

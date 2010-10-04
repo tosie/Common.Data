@@ -148,7 +148,7 @@ namespace Common.Data {
 
                     if (property_name.StartsWith("Key.")) {
                         property_name = property_name.Remove(0, "Key.".Length);
-                    } else if (Collection.PropertyCollectionType == RecordCollection.CollectionType.Association && property_name.StartsWith("Value.")) {
+                    } else if ((Collection.PropertyCollectionType == RecordCollection.CollectionType.Association || Collection.PropertyCollectionType == RecordCollection.CollectionType.AssociationWithValue) && property_name.StartsWith("Value.")) {
                         property_name = property_name.Remove(0, "Value.".Length);
                         record_type = Collection.ValueType;
                     } else {
@@ -199,13 +199,20 @@ namespace Common.Data {
         /// Adds all records of the collection specified by <see cref="SelectedRecord"/> and <see cref="PropertyName"/> to the list view.
         /// </summary>
         protected virtual void AddRecordsToListView() {
-            // Either add the HasMany<T> or the Association<TKey, TValue> records to the list.
-            if (Collection.PropertyCollectionType == RecordCollection.CollectionType.HasMany)
-                AddRecordsToListView(Collection.CollectionList); // HasMany<T>
-            else if (Collection.PropertyCollectionType == RecordCollection.CollectionType.Association)
-                AddRecordsToListView(Collection.CollectionDictionary); // Association<TKey, TValue>
-            else
-                Trace.Assert(false, "Do not know what records to add to the list views.");
+            switch (Collection.PropertyCollectionType) {
+                case RecordCollection.CollectionType.HasMany:
+                    AddRecordsToListView(Collection.CollectionList); // HasMany<T>
+                    break;
+                case RecordCollection.CollectionType.Association:
+                    AddRecordsToListView(Collection.CollectionDictionary); // Association<TKey, TValue>
+                    break;
+                //case RecordCollection.CollectionType.AssociationWithValue:
+                //    AddRecordsToListView(Collection.CollecitonDictionaryWithValues); // AssociationWithValue<TKey, TValue>
+                //    break;
+                default:
+                    Trace.Assert(false, "Unknown collection type.");
+                    break;
+            }
 
             UpdateColumnWidths();
         }

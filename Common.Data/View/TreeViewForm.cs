@@ -50,6 +50,7 @@ namespace Common.Data {
 
             RecordView.Dock = DockStyle.Fill;
             CollectionView.Dock = DockStyle.Fill;
+            CollectionWithValueView.Dock = DockStyle.Fill;
         }
 
         /// <summary>Initializes the form's basic properties. Call this before showing the form.</summary>
@@ -102,6 +103,7 @@ namespace Common.Data {
 
             RecordView.Show();
             CollectionView.Hide();
+            CollectionWithValueView.Hide();
         }
 
         void ShowRecordCollection() {
@@ -112,6 +114,19 @@ namespace Common.Data {
             CollectionView.SelectedRecord = Tree.SelectedRecord;
 
             CollectionView.Show();
+            RecordView.Hide();
+            CollectionWithValueView.Hide();
+        }
+
+        void ShowRecordCollectionWithValues() {
+            splitContainer.Panel2.Enabled = true;
+
+            CollectionWithValueView.SelectedRecord = null;
+            CollectionWithValueView.PropertyName = Tree.SelectedCollection.Name;
+            CollectionWithValueView.SelectedRecord = Tree.SelectedRecord;
+
+            CollectionWithValueView.Show();
+            CollectionView.Hide();
             RecordView.Hide();
         }
 
@@ -154,7 +169,10 @@ namespace Common.Data {
             if (e.Collection == null) {
                 ShowRecordView();
             } else {
-                ShowRecordCollection();
+                if (RecordCollection.GetCollectionType(e.Collection) == RecordCollection.CollectionType.AssociationWithValue)
+                    ShowRecordCollectionWithValues();
+                else
+                    ShowRecordCollection();
             }
         }
 

@@ -154,13 +154,20 @@ namespace Common.Data {
         /// Adds the items of an association collection to the tree view.
         /// </summary>
         protected virtual void AddAssociationNodes() {
-            // TODO: Association Collection are not really supported, for now.
+            // TODO: Association Collections are not really supported, for now.
 
             //foreach (KeyValuePair<DbRecord, DbRecord> kv in Collection.CollectionDictionary) {
             //    IEditableDbRecord record = (IEditableDbRecord)kv.Key;
             //    var node = new RecordTreeNode(record);
             //    Nodes.Add(node);
             //}
+        }
+
+        /// <summary>
+        /// Adds the items of an association collection to the tree view.
+        /// </summary>
+        protected virtual void AddAssociationWithValueNodes() {
+            // TODO: Association Collections are not really supported, for now.
         }
 
         /// <summary>
@@ -187,13 +194,20 @@ namespace Common.Data {
             // Load the collection data.
             Collection.LoadData();
             
-            // Show the collection ...
-            if (Collection.PropertyCollectionType == RecordCollection.CollectionType.Association)
-                AddAssociationNodes();
-            else if (Collection.PropertyCollectionType == RecordCollection.CollectionType.HasMany)
-                AddHasManyNodes();
-            else
-                Trace.Assert(false, "Unsupported collection type.");
+            switch (Collection.PropertyCollectionType) {
+                case RecordCollection.CollectionType.HasMany:
+                    AddHasManyNodes();
+                    break;
+                case RecordCollection.CollectionType.Association:
+                    AddAssociationNodes();
+                    break;
+                case RecordCollection.CollectionType.AssociationWithValue:
+                    AddAssociationWithValueNodes();
+                    break;
+                default:
+                    Trace.Assert(false, "Unknown collection type.");
+                    break;
+            }
 
             childNodesLoaded = true;
         }

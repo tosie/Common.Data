@@ -16,6 +16,7 @@ namespace Common.Data.Test.GUI {
 
         [Configuration("ConfigTest for Book", 10,
             ControlType = ConfigurationEntry.ControlTypes.TextBox)]
+        [SubSonicNullString]
         public string ConfigTest { get; set; }
 
         #endregion

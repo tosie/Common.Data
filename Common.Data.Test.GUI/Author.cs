@@ -28,6 +28,18 @@ namespace Common.Data.Test.GUI {
 
         #endregion
 
+        [SubSonicIgnore]
+        public AssociationWithValue<AssocKey, AssocValue> ValueAssociations { get; set; }
+
+        #region Support for: Associations
+
+        public byte[] ValueAssociationsAsBinary {
+            get { return ValueAssociations.BinaryData; }
+            set { ValueAssociations.BinaryData = value; }
+        }
+
+        #endregion
+
         [Configuration("Bücher", 10,
             ControlType = ConfigurationEntry.ControlTypes.None)]
         [DbRecordCollectionView.Column(1, "Key.Name", "Buch", -1)]
@@ -45,6 +57,7 @@ namespace Common.Data.Test.GUI {
 
         [Configuration("ConfigTest for Author", 10,
             ControlType = ConfigurationEntry.ControlTypes.TextBox)]
+        [SubSonicNullString]
         public string ConfigTest { get; set; }
 
         #endregion
@@ -54,6 +67,7 @@ namespace Common.Data.Test.GUI {
         public Author()
             : base() {
             Associations = new Association<AssocKey, AssocValue>();
+            ValueAssociations = new AssociationWithValue<AssocKey, AssocValue>();
             Books = new HasMany<Book>();
         }
 
@@ -95,6 +109,11 @@ namespace Common.Data.Test.GUI {
             assocvalue.Update();
 
             Associations[assockey] = assocvalue;
+
+            if (!ValueAssociations.ContainsKey(assockey))
+                ValueAssociations[assockey] = new Dictionary<AssocValue, string>();
+
+            ValueAssociations[assockey][assocvalue] = DateTime.Now.ToString();
         }
 
         protected void AddBook(string name) {

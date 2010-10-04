@@ -24,10 +24,11 @@
         /// </summary>
         private void InitializeComponent() {
             this.splitContainer = new System.Windows.Forms.SplitContainer();
+            this.lblText = new System.Windows.Forms.Label();
             this.Tree = new Common.Data.DbRecordTreeView();
             this.CollectionView = new Common.Data.DbRecordCollectionView();
             this.RecordView = new Common.Data.DbRecordView();
-            this.lblText = new System.Windows.Forms.Label();
+            this.CollectionWithValueView = new Common.Data.DbRecordCollectionWithValueView();
             this.splitContainer.Panel1.SuspendLayout();
             this.splitContainer.Panel2.SuspendLayout();
             this.splitContainer.SuspendLayout();
@@ -49,12 +50,22 @@
             // 
             // splitContainer.Panel2
             // 
+            this.splitContainer.Panel2.Controls.Add(this.CollectionWithValueView);
             this.splitContainer.Panel2.Controls.Add(this.CollectionView);
             this.splitContainer.Panel2.Controls.Add(this.RecordView);
             this.splitContainer.Panel2.Padding = new System.Windows.Forms.Padding(3);
             this.splitContainer.Size = new System.Drawing.Size(673, 322);
             this.splitContainer.SplitterDistance = 250;
             this.splitContainer.TabIndex = 4;
+            // 
+            // lblText
+            // 
+            this.lblText.AutoSize = true;
+            this.lblText.Location = new System.Drawing.Point(12, 9);
+            this.lblText.Name = "lblText";
+            this.lblText.Size = new System.Drawing.Size(39, 13);
+            this.lblText.TabIndex = 5;
+            this.lblText.Text = "<Title>";
             // 
             // Tree
             // 
@@ -84,14 +95,12 @@
             this.RecordView.Size = new System.Drawing.Size(324, 245);
             this.RecordView.TabIndex = 0;
             // 
-            // lblText
+            // CollectionWithValueView
             // 
-            this.lblText.AutoSize = true;
-            this.lblText.Location = new System.Drawing.Point(12, 9);
-            this.lblText.Name = "lblText";
-            this.lblText.Size = new System.Drawing.Size(39, 13);
-            this.lblText.TabIndex = 5;
-            this.lblText.Text = "<Title>";
+            this.CollectionWithValueView.Location = new System.Drawing.Point(118, 99);
+            this.CollectionWithValueView.Name = "CollectionWithValueView";
+            this.CollectionWithValueView.Size = new System.Drawing.Size(235, 152);
+            this.CollectionWithValueView.TabIndex = 2;
             // 
             // TreeViewForm
             // 
@@ -122,9 +131,10 @@
 
         protected System.Windows.Forms.SplitContainer splitContainer;
         protected System.Windows.Forms.Label lblText;
-        private DbRecordTreeView Tree;
-        private DbRecordCollectionView CollectionView;
-        private DbRecordView RecordView;
+        protected DbRecordTreeView Tree;
+        protected DbRecordCollectionView CollectionView;
+        protected DbRecordView RecordView;
+        private DbRecordCollectionWithValueView CollectionWithValueView;
 
     }
 }
