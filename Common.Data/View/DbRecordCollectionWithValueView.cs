@@ -117,7 +117,7 @@ namespace Common.Data {
                 return;
 
             if (Collection.PropertyCollectionType != RecordCollection.CollectionType.AssociationWithValue)
-                throw new ArgumentOutOfRangeException("Only AssociationWithValue collection are supported.");
+                throw new ArgumentOutOfRangeException("Only AssociationWithValue collections are supported.");
 
             // Use reflection to run a method that can validate input strings.
             var recordType = SelectedRecord.GetType();

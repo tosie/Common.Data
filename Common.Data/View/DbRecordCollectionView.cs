@@ -225,6 +225,7 @@ namespace Common.Data {
         protected virtual void ReloadData() {
             // Reset basic properties before initializing the property reflection.
             Collection.LoadData();
+            List.AllowDrop = Collection.AllowReordering;
 
             // Make sure the properties are set
             if (SelectedRecord == null || String.IsNullOrEmpty(PropertyName))
@@ -237,6 +238,21 @@ namespace Common.Data {
         #endregion
 
         #region Data Handling (Collection: HasMany<T>)
+
+        /// <summary>
+        /// Applies the ordering of the records from the list to the collection itself.
+        /// </summary>
+        protected virtual void SaveOrderToCollectionList() {
+            Collection.CollectionList.Clear();
+
+            foreach (ListViewItem item in List.Items) {
+                var record = (IDbRecord)item.Tag;
+                Collection.CollectionList.Add(record);
+            }
+
+            Collection.SaveData();
+            SelectedRecord.Update();
+        }
 
         /// <summary>
         /// Updates the list view item with the information provided by the record and according the the column definition.
@@ -661,7 +677,7 @@ namespace Common.Data {
 
         ListView DragDropSource = null;
 
-        protected virtual void ProcessDragDropItems(ListView.SelectedListViewItemCollection Items, Int32 DragIndex,
+        private void ProcessDragDropItems(ListView.SelectedListViewItemCollection Items, Int32 DragIndex,
                 ListView Source, ListView Target) {
             if (Items == null)
                 throw new ArgumentNullException("Items");
@@ -706,7 +722,19 @@ namespace Common.Data {
                 Target.EndUpdate();
             }
 
-            // TODO: Update SelectedRecord with the new order of the items
+            // Update SelectedRecord with the new order of the items.
+            switch (Collection.PropertyCollectionType) {
+                case RecordCollection.CollectionType.HasMany:
+                    SaveOrderToCollectionList();
+                    break;
+                case RecordCollection.CollectionType.Association:
+                case RecordCollection.CollectionType.AssociationWithValue:
+                    // The collection types are not supported.
+                    break;
+                default:
+                    Trace.Assert(false, "Unknown collection type");
+                    break;
+            }
         }
 
         private void SelectedList_ItemDrag(object sender, ItemDragEventArgs e) {

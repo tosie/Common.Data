@@ -174,6 +174,8 @@ namespace Common.Data {
         /// Adds the items of a has many collection to the tree view.
         /// </summary>
         protected virtual void AddHasManyNodes() {
+            Collection.CollectionList.Sort((a, b) => String.Compare((a as IEditableDbRecord).Name, (b as IEditableDbRecord).Name));
+
             foreach (IEditableDbRecord record in Collection.CollectionList) {
                 var node = new RecordTreeNode(record);
                 Nodes.Add(node);

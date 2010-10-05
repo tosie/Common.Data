@@ -30,13 +30,13 @@
             this.btnAddRecord = new System.Windows.Forms.ToolStripButton();
             this.btnRemoveRecord = new System.Windows.Forms.ToolStripButton();
             this.btnAdvanced = new System.Windows.Forms.ToolStripDropDownButton();
+            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.List = new Common.Data.FasterListView();
             this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-            this.contextMenu = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.ToolStrip.SuspendLayout();
             this.SuspendLayout();
             // 
-            // SelectedListToolStrip
+            // ToolStrip
             // 
             this.ToolStrip.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.ToolStrip.GripStyle = System.Windows.Forms.ToolStripGripStyle.Hidden;
@@ -46,46 +46,52 @@
             this.btnAdvanced});
             this.ToolStrip.Location = new System.Drawing.Point(0, 374);
             this.ToolStrip.Margin = new System.Windows.Forms.Padding(3, 0, 3, 0);
-            this.ToolStrip.Name = "SelectedListToolStrip";
+            this.ToolStrip.Name = "ToolStrip";
             this.ToolStrip.Padding = new System.Windows.Forms.Padding(3, 0, 3, 3);
             this.ToolStrip.RenderMode = System.Windows.Forms.ToolStripRenderMode.System;
             this.ToolStrip.Size = new System.Drawing.Size(692, 28);
             this.ToolStrip.TabIndex = 5;
             // 
-            // btnSelectedAddRecord
+            // btnAddRecord
             // 
             this.btnAddRecord.AutoSize = false;
             this.btnAddRecord.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnAddRecord.Image = global::Common.Data.Properties.Resources.CircularPlus;
             this.btnAddRecord.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.btnAddRecord.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnAddRecord.Name = "btnSelectedAddRecord";
+            this.btnAddRecord.Name = "btnAddRecord";
             this.btnAddRecord.Size = new System.Drawing.Size(30, 22);
             this.btnAddRecord.Visible = false;
             // 
-            // btnSelectedRemoveRecord
+            // btnRemoveRecord
             // 
             this.btnRemoveRecord.AutoSize = false;
             this.btnRemoveRecord.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnRemoveRecord.Image = global::Common.Data.Properties.Resources.CircularMinus;
             this.btnRemoveRecord.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.btnRemoveRecord.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnRemoveRecord.Name = "btnSelectedRemoveRecord";
+            this.btnRemoveRecord.Name = "btnRemoveRecord";
             this.btnRemoveRecord.Size = new System.Drawing.Size(30, 22);
             this.btnRemoveRecord.Visible = false;
             // 
-            // btnSelectedAdvanced
+            // btnAdvanced
             // 
             this.btnAdvanced.AutoSize = false;
             this.btnAdvanced.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image;
             this.btnAdvanced.Image = global::Common.Data.Properties.Resources.ActionGlyph;
             this.btnAdvanced.ImageScaling = System.Windows.Forms.ToolStripItemImageScaling.None;
             this.btnAdvanced.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.btnAdvanced.Name = "btnSelectedAdvanced";
+            this.btnAdvanced.Name = "btnAdvanced";
             this.btnAdvanced.ShowDropDownArrow = false;
             this.btnAdvanced.Size = new System.Drawing.Size(40, 22);
             // 
-            // SelectedList
+            // contextMenu
+            // 
+            this.contextMenu.Name = "SelectedListContextMenu";
+            this.contextMenu.Size = new System.Drawing.Size(61, 4);
+            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
+            // 
+            // List
             // 
             this.List.AllowDrop = true;
             this.List.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
@@ -103,22 +109,19 @@
             listViewItem2});
             this.List.LabelWrap = false;
             this.List.Location = new System.Drawing.Point(3, 3);
-            this.List.Name = "SelectedList";
+            this.List.Name = "List";
             this.List.Size = new System.Drawing.Size(686, 368);
             this.List.TabIndex = 4;
             this.List.UseCompatibleStateImageBehavior = false;
             this.List.View = System.Windows.Forms.View.Details;
+            this.List.ItemDrag += new System.Windows.Forms.ItemDragEventHandler(this.SelectedList_ItemDrag);
+            this.List.DragDrop += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragDrop);
+            this.List.DragEnter += new System.Windows.Forms.DragEventHandler(this.SelectedList_DragEnter);
             // 
             // columnHeader2
             // 
             this.columnHeader2.Text = "Name";
             this.columnHeader2.Width = 252;
-            // 
-            // SelectedListContextMenu
-            // 
-            this.contextMenu.Name = "SelectedListContextMenu";
-            this.contextMenu.Size = new System.Drawing.Size(153, 26);
-            this.contextMenu.Opening += new System.ComponentModel.CancelEventHandler(this.contextMenu_Opening);
             // 
             // DbRecordCollectionView
             // 

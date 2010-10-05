@@ -8,7 +8,13 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace Common.Data {
+
+    /// <summary>
+    /// Static class that helps preloading external libraries so that later P/Invoke calls do not need to search for these libraries by themselves.
+    /// </summary>
     public static class LibraryLoader {
+
+        static readonly string debug_category = "LibraryLoader";
 
         /// <summary>
         /// Loads the specified module into the address space of the calling process. The specified module may cause other modules to be loaded.
@@ -39,38 +45,79 @@ namespace Common.Data {
         public extern static int LoadLibrary(string librayName);
 
         /// <summary>
-        /// This method tries to preload a library file. It does so by looking in <paramref name="libDir"/> first and using the default search paths afterwards.
+        /// Expands the given path name.
         /// </summary>
-        /// <param name="libDir">The full name of the directory containing libraries (may contain environment variables as well as %appdir%, which will be replaced by the directory of the applications executable path, and %platform%, which will be replaced by "x86" or "x64" depending on the current platform the process is running on).</param>
-        /// <param name="lib">The file name (without path) of the library to load.</param>
-        /// <returns>True, if the SQLite library was loaded, false otherwise.</returns>
-        public static bool TryLoad(string libDir, string lib) {
-            var debug_category = "LibraryLoader";
-
+        /// <param name="path">The path to expand. May contain environment variables as well as %appdir%, which will be replaced by the directory of the applications executable path, and %platform%, which will be replaced by "x86" or "x64" depending on the current platform the process is running on.</param>
+        /// <returns></returns>
+        public static string PreparePath(string path) {
             var appdir = Path.GetDirectoryName(Application.ExecutablePath);
             var platform = (IntPtr.Size == 4 ? "x86" : "x64");
 
             // String Replacements
             // - %appdir% and %platform% are special
-            libDir = libDir.Replace("%appdir%", appdir);
-            libDir = libDir.Replace("%platform%", platform);
+            path = path.Replace("%appdir%", appdir);
+            path = path.Replace("%platform%", platform);
             // - all other environment variables are simple
-            libDir = Environment.ExpandEnvironmentVariables(libDir);
+            path = Environment.ExpandEnvironmentVariables(path);
+
+            if (Directory.Exists(path))
+                return Path.GetFullPath(path);
+            else
+                return path;
+        }
+
+        /// <summary>
+        /// This method tries to find the full path to a library file. It does so by looking in <paramref name="libDir"/>. No search is done in other paths.
+        /// </summary>
+        /// <param name="libDir">The full name of the directory containing libraries (may contain environment variables as well as %appdir%, which will be replaced by the directory of the applications executable path, and %platform%, which will be replaced by "x86" or "x64" depending on the current platform the process is running on).</param>
+        /// <param name="lib">The file name (without path) of the library to load. If the file name contains search operators (?, *), the first match will be used.</param>
+        /// <returns>The full path to the library file, if found, otherwise null.</returns>
+        public static string FindLib(string libDir, string lib) {
+            libDir = PreparePath(libDir);
+
+            string resolved_lib;
+            string result;
+
+            // Look in libDir (maybe "%appdir%\Libs\%platform%").
+            if (Directory.Exists(libDir)) {
+                resolved_lib = lib;
+                if (lib.IndexOfAny(new char[] { '?', '*' }) >= 0) {
+                    var files = Directory.GetFiles(libDir, lib);
+                    if (files.Length > 0)
+                        resolved_lib = files[0];
+                }
+
+                result = Path.Combine(libDir, resolved_lib);
+
+                if (File.Exists(result))
+                    return result;
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// This method tries to preload a library file. It does so by looking in <paramref name="libDir"/> first and using the default search paths afterwards.
+        /// </summary>
+        /// <param name="libDir">The full name of the directory containing libraries (may contain environment variables as well as %appdir%, which will be replaced by the directory of the applications executable path, and %platform%, which will be replaced by "x86" or "x64" depending on the current platform the process is running on).</param>
+        /// <param name="lib">The file name (without path) of the library to load. If the file name contains search operators (?, *), the first match will be used.</param>
+        /// <returns>True, if the library was loaded, false otherwise.</returns>
+        public static bool TryLoad(string libDir, string lib) {
+            libDir = PreparePath(libDir);
 
             var handle = 0;
 
-            // Look in "%appdir%\Libs\%platform%
-            if (Directory.Exists(libDir)) {
-                handle = LoadLibrary(Path.Combine(libDir, lib));
+            // Look in libDir (maybe "%appdir%\Libs\%platform%").
+            var fullpath = FindLib(libDir, lib);
+            if (fullpath != null) {
+                handle = LoadLibrary(fullpath);
                 if (handle > 0) {
-                    Debug.WriteLine(String.Format("Loaded the library \"{0}\" from \"{1}\".", lib, libDir), debug_category);
+                    Debug.WriteLine(String.Format("Loaded the library \"{0}\" from \"{1}\".", lib, fullpath), debug_category);
                     return true;
                 }
-            } else {
-                Debug.WriteLine(String.Format("The given directory \"{1}\" to load the library \"{1}\" from does not exist.", lib, libDir), debug_category);
             }
 
-            // Look in "%path%"
+            // Look in "%path%".
             handle = LoadLibrary(lib);
             if (handle > 0) {
                 Debug.WriteLine(String.Format("Loaded the library \"{0}\" from the search paths.", lib), debug_category);
@@ -82,4 +129,5 @@ namespace Common.Data {
         }
 
     }
+
 }
