@@ -61,6 +61,36 @@ namespace Common.Data {
         }
 
         /// <summary>
+        /// Set to true if the relation "obj1 -&gt; obj1" should be editable by the user. If false, the cell representing that relation is read-only. Default value: false.
+        /// </summary>
+        [DefaultValue(false)]
+        [Description("Set to true if the relation \"obj1 -> obj1\" should be editable by the user. If false, the cell representing that relation is read-only. Default value: false.")]
+        public bool AllowSelfToSelfAssignments {
+            get {
+                return Matrix.AllowSelfToSelfAssignments;
+            }
+
+            set {
+                Matrix.AllowSelfToSelfAssignments = value;
+            }
+        }
+
+        /// <summary>
+        /// Set to true if a value change of the relation "obj1 -&gt; obj2" should be reflected to the relation "obj2 -&gt; obj1". Default value: true.
+        /// </summary>
+        [DefaultValue(true)]
+        [Description("Set to true if a value change of the relation \"obj1 -> obj2\" should be reflected to the relation \"obj2 -> obj1\". Default value: true.")]
+        public bool SynchronizeTwoWayAssignments {
+            get {
+                return Matrix.SynchronizeTwoWayAssignments;
+            }
+
+            set {
+                Matrix.SynchronizeTwoWayAssignments = value;
+            }
+        }
+
+        /// <summary>
         /// Reference to a method that is called everytime either the drop down menu of the advanced button is opening. Set by <see cref="InitializeMenus"/>.
         /// </summary>
         /// <remarks>
