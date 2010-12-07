@@ -13,6 +13,9 @@ if errorlevel 1 goto update_error
 copy /Y ..\Common.Configuration\Release\*.xml %libdir%
 if errorlevel 1 goto update_error
 
+copy /Y ..\SubSonic\Release\*.dll %libdir%
+if errorlevel 1 goto update_error
+
 goto update_ok
 
 :update_ok
