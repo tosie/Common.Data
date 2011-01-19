@@ -9,8 +9,8 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Common.Data")]
-[assembly: AssemblyCopyright("")]
+[assembly: AssemblyProduct("")]
+[assembly: AssemblyCopyright("Copyright © Thomas Siebers 2010, 2011")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,15 +22,11 @@ using System.Runtime.InteropServices;
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 [assembly: Guid("d2d9ce8e-9f8c-4cde-b525-226b664d9434")]
 
-// Version information for an assembly consists of the following four values:
+// Version information for this assembly consists of the following four values:
 //
 //      Major Version
-//      Minor Version 
-//      Build Number
-//      Revision
+//      Minor Version
+//      Patch Version
 //
-// You can specify all the values or you can default the Build and Revision Numbers 
-// by using the '*' as shown below:
-// [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+// Versioning is done according to the rules of semantic versioning (http://www.semver.org).
+[assembly: AssemblyVersion("0.3.0")]
