@@ -26,13 +26,35 @@ namespace Common.Data {
         [SubSonicIgnore]
         public SimpleRepository OwningRepository { get; set; }
 
+        /// <summary>
+        /// Field used to identify a record in a database. Automatically set
+        /// by the <see cref="Create&lt;T&gt;()"/> or <see cref="Update&lt;T&gt;()"/> methods.
+        /// Do not change this value on your own unless you know what you
+        /// are doing.
+        /// </summary>
         public Int64 Id { get; set; }
 
         /// <summary>
         /// Is true after a successful call to +Delete+.
         /// </summary>
         [SubSonicIgnore]
-        public Boolean Deleted { get; protected set; }
+        public Boolean IsDeleted { get; protected set; }
+
+        /// <summary>
+        /// Obsolete. Use <see cref="IsDeleted"/> instead.
+        /// </summary>
+        [SubSonicIgnore]
+        [Obsolete("Will be removed in later versions. Replaced by 'IsDeleted'.")]
+        public Boolean Deleted {
+            get { return IsDeleted; }
+            protected set { IsDeleted = value; }
+        }
+
+        /// <summary>
+        /// Returns true if the instance has been stored in a database, otherwise false.
+        /// </summary>
+        [SubSonicIgnore]
+        public Boolean IsInDatabase { get { return OwningRepository != null; } }
 
         #endregion
 
@@ -102,6 +124,22 @@ namespace Common.Data {
             return GetCache<T>(repository).Find(i => i.Id == Id) != null;
         }
 
+        protected void AddToDatabase<T>(SimpleRepository repository, bool initializeDefaults = false, Object tag = null) where T : DbRecord, IDbRecord, new()  {
+            IsDeleted = false;
+            OwningRepository = repository;
+
+            // Initialize the new object with default values
+            if (initializeDefaults)
+                ((T)this).InitializeWithDefaults(tag);
+
+            // Add it to the database
+            repository.Add<T>((T)this);
+
+            // Add it to the cache
+            List<T> Cache = GetCache<T>(repository);
+            Cache.Add((T)this);
+        }
+
         /// <summary>
         /// Creates a new instance of the class, initializes it with default value
         /// and saves it to the database.
@@ -116,18 +154,7 @@ namespace Common.Data {
 
             // Create a new instance of T
             T instance = new T();
-            instance.Deleted = false;
-            instance.OwningRepository = repository;
-
-            // Initialize the new object with default values
-            instance.InitializeWithDefaults(tag);
-
-            // Add it to the database
-            repository.Add<T>(instance);
-            
-            // Add it to the cache
-            List<T> Cache = GetCache<T>(repository);
-            Cache.Add(instance);
+            instance.AddToDatabase<T>(repository, true, tag);
 
             return instance;
         }
@@ -206,7 +233,7 @@ namespace Common.Data {
             Cache.Add(instance);
 
             // Let the object load itself
-            instance.Deleted = false;
+            instance.IsDeleted = false;
             instance.OwningRepository = repository;
             instance.AfterLoad();
 
@@ -260,7 +287,7 @@ namespace Common.Data {
 
                     // Let the objects load themselves
                     instances.ForEach(instance => {
-                        instance.Deleted = false;
+                        instance.IsDeleted = false;
                         instance.OwningRepository = repository;
                         instance.AfterLoad();
                     });
@@ -328,25 +355,17 @@ namespace Common.Data {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public void Update<T>() where T : DbRecord, IDbRecord, new() {
-            // Has the record been stored in a database, yet?
-            if (OwningRepository == null) {
-                Deleted = false;
-                OwningRepository = Repository;
-
-                // Add it to the database
-                OwningRepository.Add<T>((T)this);
-
-                // Add it to the cache
-                List<T> Cache = GetCache<T>(OwningRepository);
-                Cache.Add((T)this);
-            }
-
             // Do not update a deleted record
-            if (Deleted)
+            if (IsDeleted)
                 return;
 
             if (!(this as T).BeforeUpdate())
                 return;
+
+            // Has the record been stored in a database, yet?
+            if (!IsInDatabase) {
+                AddToDatabase<T>(Repository);
+            }
 
             OwningRepository.Update<T>(this as T);
         }
@@ -364,7 +383,7 @@ namespace Common.Data {
                 return;
 
             // Filter out records that have been deleted
-            Records = Records.Where(r => !r.Deleted).ToList();
+            Records = Records.Where(r => !r.IsDeleted).ToList();
 
             // Event handler
             // TODO: Add transaction support?
@@ -372,6 +391,9 @@ namespace Common.Data {
 
             if (!can_update)
                 return;
+
+            // Save records to the database that have not been saved, yet.
+            Records.Where(r => !r.IsInDatabase).ToList().ForEach(r => r.AddToDatabase<T>(Repository));
 
             // Group by OwningRepository
             var by_repository = new Dictionary<SimpleRepository, List<T>>();
@@ -400,7 +422,7 @@ namespace Common.Data {
         /// <returns></returns>
         public Boolean Delete<T>() where T : DbRecord, IDbRecord, new() {
             // Do not delete twice
-            if (Deleted)
+            if (IsDeleted)
                 return true;
 
             // Nested delete
@@ -417,7 +439,7 @@ namespace Common.Data {
             // (so that vacuum is not done on all repositories)
             SharedObjects.Instance.NeedsVacuum[OwningRepository] = true;
 
-            Deleted = true;
+            IsDeleted = true;
             return true;
         }
 

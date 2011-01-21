@@ -136,7 +136,7 @@ namespace Common.Data {
             }
 
             // Let the object load itself
-            instance.Deleted = false;
+            instance.IsDeleted = false;
             instance.OwningRepository = ActiveRepository;
             instance.AfterLoad();
 
