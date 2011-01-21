@@ -4,6 +4,89 @@
         <name>Common.Configuration</name>
     </assembly>
     <members>
+        <member name="F:Common.Configuration.ConfigurationAttribute.AvailableValidators">
+            <summary>
+            Contains a mapping of predefined validator methods with their string representation (= name).
+            Used in <see cref="M:Common.Configuration.ConfigurationAttribute.ApplyToConfigurationEntry(Common.Configuration.ConfigurationEntry)"/>.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationAttribute.ApplyToConfigurationEntry(Common.Configuration.ConfigurationEntry)">
+            <summary>
+            Applies the settings of this attribute to the given configuration entry.
+            </summary>
+            <param name="Entry"></param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationAttribute.#ctor(System.String,System.Int32)">
+            <summary>
+            
+            </summary>
+            <param name="Text">Label text naming a property in a very short manner.</param>
+            <param name="SortKey">Using this the order of all configurable properties is determined.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationAttribute.#ctor(System.String,System.Int32,System.Object)">
+            <summary>
+            
+            </summary>
+            <param name="Text">Label text naming a property in a very short manner.</param>
+            <param name="SortKey">Using this the order of all configurable properties is determined.</param>
+            <param name="GroupKey">Configurable properties are grouped using this.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationAttribute.#ctor(System.String,System.Int32,System.Object,Common.Configuration.ConfigurationEntry.ControlTypes)">
+            <summary>
+            
+            </summary>
+            <param name="Text">Label text naming a property in a very short manner.</param>
+            <param name="SortKey">Using this the order of all configurable properties is determined.</param>
+            <param name="GroupKey">Configurable properties are grouped using this.</param>
+            <param name="ControlType">Defines the GUI control that should be used when editing a property.</param>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.Text">
+            <summary>
+            Label text naming a property in a very short manner.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.SubText">
+            <summary>
+            Text that describes a property in a more detailed fashion.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.SortKey">
+            <summary>
+            Using this the order of all configurable properties is determined.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.GroupKey">
+            <summary>
+            Configurable properties are grouped using this.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.ControlType">
+            <summary>
+            Defines the GUI control that should be used when editing a property.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.ReadOnly">
+            <summary>
+            If true a property cannot be edited by a user.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.Minimum">
+            <summary>
+            Minimum value that should be accepted by a validator.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.Maximum">
+            <summary>
+            Maximum value that should be accepted by a validator.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationAttribute.Validator">
+            <summary>
+            Validators to use when validating user input. Currently available validators are "Int32",
+            "Double", "Boolean", "FileExists" and "DirectoryExists". They can be combined by separating
+            them with a comma.
+            </summary>
+        </member>
         <member name="T:Common.Configuration.Profiler">
             <summary>
             The profiler class helps in profiling code sections. It outputs the time required to code completion and memory used before and afterwads.
@@ -55,6 +138,334 @@
             </summary>
             <param name="Text">A string containing the profiling summary.</param>
         </member>
+        <member name="T:Common.Configuration.ConfigurationEntry">
+            <summary>Class that represents a single element which can be configured.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.value">
+            <summary>Holds the current value of the configuration entry. Should be accessed using the <see cref="P:Common.Configuration.ConfigurationEntry.Value"/> property.</summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.GetValueAsString(System.Object)">
+            <summary>
+            Returns the given value as a formatted string.
+            </summary>
+            <param name="Value">The value to format.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.GetValueAsString(System.Object,System.String)">
+            <summary>
+            Returns the given value as a formatted string using the <paramref name="NullString"/>
+            when the <paramref name="Value"/> is null.
+            </summary>
+            <param name="Value">The value to format.</param>
+            <param name="NullString">The string to show when <paramref name="Value"/> is null.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.GetPossibleValues">
+            <summary>
+            Helper method that queries handlers of the <see cref="E:Common.Configuration.ConfigurationEntry.QueryPossibleValues"/> event and returns the array
+            of possible values.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.IsValueValid(System.Object@)">
+            <summary>
+            Determines if a given value is valid or not by using handlers of the <see cref="E:Common.Configuration.ConfigurationEntry.ValidateValue"/> event.
+            </summary>
+            <param name="Value">The value to validate. Passed by reference and may be changed by a call to this method.</param>
+            <returns>True if the value is valid, false otherwise.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.RaiseEditor(System.Windows.Forms.IWin32Window)">
+            <summary>
+            Uses the <see cref="E:Common.Configuration.ConfigurationEntry.Editor"/> event to show an advanced editor window to modify the configuration entry.
+            </summary>
+            <param name="Owner">Window that acts as owner of newly created windows.</param>
+            <returns>True if the value changed, false otherwise.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.RaiseFormatValue(System.Object,System.String@)">
+            <summary>
+            Formats a value to a string representation using the <see cref="E:Common.Configuration.ConfigurationEntry.FormatValue"/> event.
+            </summary>
+            <param name="Value">The value to be formatted.</param>
+            <param name="ValueAsString">The string representation of the given value.</param>
+            <returns>True if the value was formatted successfully, otherwise false.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValueHasChanged">
+            <summary>
+            Raises the <see cref="E:Common.Configuration.ConfigurationEntry.PropertyChanged"/> event for the <see cref="P:Common.Configuration.ConfigurationEntry.Value"/> property.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.Serialize">
+            <summary>
+            Converts the <see cref="P:Common.Configuration.ConfigurationEntry.Value"/> to a string that can be re-converted by <see cref="M:Common.Configuration.ConfigurationEntry.Deserialize(System.String)"/>.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.Deserialize(System.String)">
+            <summary>
+            Deserializes a string serialized by a call to (<seealso cref="M:Common.Configuration.ConfigurationEntry.Serialize"/>) and assigns it to the <see cref="P:Common.Configuration.ConfigurationEntry.Value"/> property..
+            </summary>
+            <param name="data"></param>
+            <returns>True if successful, false otherwise.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ToInt32(System.Object,System.Int32)">
+            <summary>
+            Tries to convert everything into an Int32.
+            </summary>
+            <param name="Value">The value to be converted.</param>
+            <param name="Default">The value to use when the given <paramref name="Value"/> cannot be converted.</param>
+            <returns>The converted value.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ToDouble(System.Object,System.Double)">
+            <summary>
+            Tries to convert everything into an Double.
+            </summary>
+            <param name="Value">The value to be converted.</param>
+            <param name="Default">The value to use when the given <paramref name="Value"/> cannot be converted.</param>
+            <returns>The converted value.</returns>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValidateInt32Value(Common.Configuration.ConfigurationEntry,System.Object@,System.Boolean@)">
+            <summary>
+            Generic validator for Int32 values. Includes constraint checking by respecting <see cref="P:Common.Configuration.ConfigurationEntry.Minimum"/> and <see cref="P:Common.Configuration.ConfigurationEntry.Maximum"/> values.
+            </summary>
+            <param name="Sender">The configuration entry for which the given <paramref name="Value"/> should be validated.</param>
+            <param name="Value">The value to validate.</param>
+            <param name="Valid">True if the value is valid or has been converted into a valid value, otherwise false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValidateDoubleValue(Common.Configuration.ConfigurationEntry,System.Object@,System.Boolean@)">
+            <summary>
+            Generic validator for Double values. Includes constraint checking by respecting <see cref="P:Common.Configuration.ConfigurationEntry.Minimum"/> and <see cref="P:Common.Configuration.ConfigurationEntry.Maximum"/> values.
+            </summary>
+            <param name="Sender">The configuration entry for which the given <paramref name="Value"/> should be validated.</param>
+            <param name="Value">The value to validate.</param>
+            <param name="Valid">True if the value is valid or has been converted into a valid value, otherwise false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValidateBooleanValue(Common.Configuration.ConfigurationEntry,System.Object@,System.Boolean@)">
+            <summary>
+            Generic validator for Boolean values.
+            </summary>
+            <param name="Sender">The configuration entry for which the given <paramref name="Value"/> should be validated.</param>
+            <param name="Value">The value to validate.</param>
+            <param name="Valid">True if the value is valid or has been converted into a valid value, otherwise false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValidateFileExists(Common.Configuration.ConfigurationEntry,System.Object@,System.Boolean@)">
+            <summary>
+            Generic validator for files. Checks a file exists.
+            </summary>
+            <param name="Sender">The configuration entry for which the given <paramref name="Value"/> should be validated.</param>
+            <param name="Value">The value to validate.</param>
+            <param name="Valid">True if the value is valid or has been converted into a valid value, otherwise false.</param>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationEntry.ValidateDirectoryExists(Common.Configuration.ConfigurationEntry,System.Object@,System.Boolean@)">
+            <summary>
+            Generic validator for directories. Checks if a directory exists.
+            </summary>
+            <param name="Sender">The configuration entry for which the given <paramref name="Value"/> should be validated.</param>
+            <param name="Value">The value to validate.</param>
+            <param name="Valid">True if the value is valid or has been converted into a valid value, otherwise false.</param>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Name">
+            <summary>Short name of the configuration entry.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Text">
+            <summary>Short text to describe the configuration entry.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.SubText">
+            <summary>Text that describes the configuration entry in a more detailed fashion.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.SortKey">
+            <summary>Using this the order of all configuration entries is determined.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.GroupKey">
+            <summary>Configuration entries are grouped using this.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.ControlType">
+            <summary>Defines the GUI control to be used when editing a configuration entry.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Tag">
+            <summary>Custom object assigned to the configuration entry. Is not used internally.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.ReadOnly">
+            <summary>If true the GUI control representing the property will be disabled and any user input is prohibited.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Minimum">
+            <summary>Minimum value that can be accepted. Used by validators.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Maximum">
+            <summary>Maximum value that can be accepted. Used by validators.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.Value">
+            <summary>Current value of the configuration entry. Raises the <see cref="E:Common.Configuration.ConfigurationEntry.PropertyChanged"/> event whenever the value changes.</summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationEntry.ValueAsString">
+            <summary>Returns the current value as a formatted string.</summary>
+        </member>
+        <member name="E:Common.Configuration.ConfigurationEntry.QueryPossibleValues">
+            <summary>
+            Event that is raised whenever a list of valid and accepted values for the configuration entry is needed
+            (e.g. when showing a combobox to edit the configuration entry).
+            </summary>
+        </member>
+        <member name="E:Common.Configuration.ConfigurationEntry.ValidateValue">
+            <summary>
+            Event used to validate values for the configuration entry.
+            </summary>
+        </member>
+        <member name="E:Common.Configuration.ConfigurationEntry.Editor">
+            <summary>
+            Event that is called when an advanced window to edit the configuration entry should be shown.
+            </summary>
+        </member>
+        <member name="E:Common.Configuration.ConfigurationEntry.FormatValue">
+            <summary>
+            Raised whenever the value of a configuration entry needs to be represented as a string.
+            </summary>
+        </member>
+        <member name="E:Common.Configuration.ConfigurationEntry.PropertyChanged">
+            <summary>
+            Raised whenever the value of a property has changed. Currently this is used
+            exclusively for the <see cref="P:Common.Configuration.ConfigurationEntry.Value"/> property.
+            </summary>
+        </member>
+        <member name="T:Common.Configuration.ConfigurationEntry.ControlTypes">
+            <summary>Set of GUI controls that can be used to edit a configuration entry.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.None">
+            <summary>Entry cannot be edited via GUI.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.TextBox">
+            <summary>Show a single line textbox.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.ComboBox">
+            <summary>Show a combobox. Remember to define the *PossibleValues property when using the <see cref="T:Common.Configuration.ConfigurationAttribute"/>.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.CheckBox">
+            <summary>Show a checkbox.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.Label">
+            <summary>Show a label. Editing will not be possible.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.Button">
+            <summary>Show a button. The *Editor method will be called upon a button click when using the <see cref="T:Common.Configuration.ConfigurationAttribute"/>.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.GenericConfiguration">
+            <summary>If the entry's value type is of <see cref="F:Common.Configuration.ConfigurationEntry.ControlTypes.GenericConfiguration"/> use this
+            to show a button to edit that configuration.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.Slider">
+            <summary>Show a slider.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.File">
+            <summary>Show a file selector textbox.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.Directory">
+            <summary>Show a directory selector textbox.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.MultiLineTextBox">
+            <summary>Show a multiline textbox.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.ComboBoxAsLinkLabel">
+            <summary>Show a link label that opens a menu containing combobox items whenever it is clicked.</summary>
+        </member>
+        <member name="F:Common.Configuration.ConfigurationEntry.ControlTypes.ButtonAsLinkLabel">
+            <summary>Show a link label that raises the *Editor method (when using the <see cref="T:Common.Configuration.ConfigurationAttribute"/>) or the <see cref="E:Common.Configuration.ConfigurationEntry.Editor"/> event whenever it is clicked.</summary>
+        </member>
+        <member name="T:Common.Configuration.ConfigurationEntry.QueryPossibleValuesEvent">
+            <summary>
+            Defines the signature of the <see cref="E:Common.Configuration.ConfigurationEntry.QueryPossibleValues"/> event.
+            </summary>
+            <param name="Sender">Configuration entry for which to return an array of possible values.</param>
+            <param name="PossibleValues">The parameter that receives the array of possible values.</param>
+        </member>
+        <member name="T:Common.Configuration.ConfigurationEntry.ValidateEvent">
+            <summary>
+            Defines the signature for the <see cref="E:Common.Configuration.ConfigurationEntry.ValidateValue"/> event.
+            </summary>
+            <param name="Sender">Configuration entry for which a value should be validated.</param>
+            <param name="Value">The value to validate. Passed by reference and may be changed by event handlers.</param>
+            <param name="Valid">Set to true if the value is valid, otherwise false.</param>
+        </member>
+        <member name="T:Common.Configuration.ConfigurationEntry.EditorHandler">
+            <summary>
+            Defines the signature of the <see cref="E:Common.Configuration.ConfigurationEntry.Editor"/> event.
+            </summary>
+            <param name="Sender">Configuration entry for which to show an editor.</param>
+            <param name="Owner">Window that acts as owner of any newly created windows by the event handlers.</param>
+            <returns>True if the editor changed the value, false otherwise.</returns>
+        </member>
+        <member name="T:Common.Configuration.ConfigurationEntry.FormatValueHandler">
+            <summary>
+            Defines the signature of the <see cref="E:Common.Configuration.ConfigurationEntry.FormatValue"/> event.
+            </summary>
+            <param name="Sender">The configuration entry for which a value should be formatted as a string.</param>
+            <param name="Value">The value to be formatted.</param>
+            <returns>A formatted string representing the <paramref name="Value"/>.</returns>
+        </member>
+        <member name="T:Common.Configuration.GenericConfiguration">
+            <summary>Represents a set of <see cref="T:Common.Configuration.ConfigurationEntry"/> instances and includes helper methods.</summary>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.#ctor">
+            <summary>
+            Create a new instance of this class.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Serialize">
+            <summary>
+            
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Deserialize(System.String)">
+            <summary>
+            
+            </summary>
+            <param name="data"></param>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Add(Common.Configuration.ConfigurationEntry,System.Object)">
+            <summary>
+            Add a new <see cref="T:Common.Configuration.ConfigurationEntry"/> to the set.
+            </summary>
+            <param name="key"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Add(Common.Configuration.ConfigurationEntry)">
+            <summary>
+            Add a new <see cref="T:Common.Configuration.ConfigurationEntry"/> to the set.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Contains(Common.Configuration.ConfigurationEntry)">
+            <summary>
+            Check if a <see cref="T:Common.Configuration.ConfigurationEntry"/> has already been added to the set.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Remove(Common.Configuration.ConfigurationEntry)">
+            <summary>
+            Remove a <see cref="T:Common.Configuration.ConfigurationEntry"/> from the set.
+            </summary>
+            <param name="key"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.Clear">
+            <summary>
+            Remove all configuration entries from the set.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.FindEntryByName(System.String)">
+            <summary>
+            Find a <see cref="T:Common.Configuration.ConfigurationEntry"/> by its name.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.UpdateValues">
+            <summary>
+            Reads values of the properties of the <see cref="P:Common.Configuration.GenericConfiguration.BoundObject"/> and assigns them to the
+            configuration entries in the set.
+            </summary>
+        </member>
         <member name="M:Common.Configuration.GenericConfiguration.GetDirectType(System.Object)">
             <summary>
             Returns the type of the object. If the type is of a Castle.Proxies type, the base type is returned.
@@ -62,10 +473,33 @@
             <param name="obj"></param>
             <returns></returns>
         </member>
+        <member name="M:Common.Configuration.GenericConfiguration.CreateFor(System.Object)">
+            <summary>
+            Creates a configuration for a given object by using its properties and the <see cref="T:Common.Configuration.ConfigurationAttribute"/>.
+            </summary>
+            <param name="BoundObject">The object for which a set of configuration entries should be created.</param>
+            <returns>An instance of the <see cref="T:Common.Configuration.GenericConfiguration"/> class that is bound the the given object.</returns>
+        </member>
+        <member name="M:Common.Configuration.GenericConfiguration.CreateFor(System.Type)">
+            <summary>
+            Creates a configuration for a given type. The type must be a class.
+            </summary>
+            <param name="type">The type that defines the configuration entries.</param>
+            <returns>An instance of the <see cref="T:Common.Configuration.GenericConfiguration"/> class that contains the configuration entries as defined by the given type.</returns>
+            <exception cref="T:System.ArgumentException">Thrown when <paramref name="type"/> is not a class type.</exception>
+        </member>
         <member name="P:Common.Configuration.GenericConfiguration.BoundObject">
             <summary>
-            Represents the object that this configuration is bound to.
+            Represents the object that this configuration is bound to. This means that changes in any
+            configuration entry are automatically reflected to this object.
             </summary>
+        </member>
+        <member name="P:Common.Configuration.GenericConfiguration.Item(System.String)">
+            <summary>
+            Gets/Sets the value of a <see cref="T:Common.Configuration.ConfigurationEntry"/> by its name.
+            </summary>
+            <param name="name"></param>
+            <returns></returns>
         </member>
         <member name="F:Common.Configuration.ValueMatrix.components">
             <summary> 
@@ -84,6 +518,20 @@
             the contents of this method with the code editor.
             </summary>
         </member>
+        <member name="T:Common.Configuration.ConfigurationControl">
+            <summary>GUI editor for instances of <see cref="T:Common.Configuration.GenericConfiguration"/> sets.</summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationControl.#ctor">
+            <summary>
+            Create a new instance of this class.
+            </summary>
+        </member>
+        <member name="M:Common.Configuration.ConfigurationControl.Save">
+            <summary>
+            Stores all values of the GUI controls back to their respective <see cref="T:Common.Configuration.ConfigurationEntry"/>.
+            Calling this method is not required when <see cref="P:Common.Configuration.ConfigurationControl.AutoSave"/> is true.
+            </summary>
+        </member>
         <member name="F:Common.Configuration.ConfigurationControl.components">
             <summary> 
             Required designer variable.
@@ -99,6 +547,25 @@
             <summary> 
             Required method for Designer support - do not modify 
             the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationControl.Configuration">
+            <summary>
+            A single instance of <see cref="T:Common.Configuration.GenericConfiguration"/> that should be shown on the control.
+            Overrides <see cref="P:Common.Configuration.ConfigurationControl.MultipleConfigs"/> if set.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationControl.MultipleConfigs">
+            <summary>
+            Multiple instances of <see cref="T:Common.Configuration.GenericConfiguration"/> that should be shown on the control.
+            Overrides <see cref="P:Common.Configuration.ConfigurationControl.Configuration"/> is set.
+            </summary>
+        </member>
+        <member name="P:Common.Configuration.ConfigurationControl.AutoSave">
+            <summary>
+            If true all changes of the controls are immediately reflected back to their corresponding
+            <see cref="T:Common.Configuration.ConfigurationEntry"/>. If false a call to <see cref="M:Common.Configuration.ConfigurationControl.Save"/> is required to
+            assign the new values entered by a user to the entries.
             </summary>
         </member>
         <member name="F:Common.Configuration.ConfigurationForm.components">
