@@ -328,6 +328,19 @@ namespace Common.Data {
         /// </summary>
         /// <typeparam name="T"></typeparam>
         public void Update<T>() where T : DbRecord, IDbRecord, new() {
+            // Has the record been stored in a database, yet?
+            if (OwningRepository == null) {
+                Deleted = false;
+                OwningRepository = Repository;
+
+                // Add it to the database
+                OwningRepository.Add<T>((T)this);
+
+                // Add it to the cache
+                List<T> Cache = GetCache<T>(OwningRepository);
+                Cache.Add((T)this);
+            }
+
             // Do not update a deleted record
             if (Deleted)
                 return;
