@@ -49,5 +49,19 @@ namespace Common.Data.Test.GUI {
             var authors = Author.Read().Select(a => (IEditableDbRecord)a).ToList();
             TreeViewForm.EditRecords(this, "Author", "Autoren bearbeiten", authors);
         }
+
+        private void button5_Click(object sender, EventArgs e) {
+            var record = DbRecordSelectorForm.SelectRecord(
+                this,
+                "RecordSelector",
+                "Buch auswählen",
+                typeof(Book),
+                ListExtensions.ConvertTo<Book, IEditableDbRecord>(Book.Read()));
+
+            if (record == null)
+                MessageBox.Show("Nothing selected.");
+            else
+                MessageBox.Show("Selected: " + record.Name);
+        }
     }
 }

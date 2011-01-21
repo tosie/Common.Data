@@ -83,6 +83,21 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="View\DbRecordSelectorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\DbRecordSelectorForm.Designer.cs">
+      <DependentUpon>DbRecordSelectorForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="ViewHelpers\DbRecordSelector.ColumnDefinition.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="View\DbRecordSelector.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="View\DbRecordSelector.Designer.cs">
+      <DependentUpon>DbRecordSelector.cs</DependentUpon>
+    </Compile>
     <Compile Include="View\DbRecordCollectionWithValueView.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -175,6 +190,12 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
+    <EmbeddedResource Include="View\DbRecordSelectorForm.resx">
+      <DependentUpon>DbRecordSelectorForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\DbRecordSelector.resx">
+      <DependentUpon>DbRecordSelector.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="View\DbRecordCollectionWithValueView.resx">
       <DependentUpon>DbRecordCollectionWithValueView.cs</DependentUpon>
     </EmbeddedResource>
@@ -244,6 +265,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Attributes\DbRecordCollectionView.ColumnAttribute.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Attributes\DbRecordSelector.ColumnAttribute.cs">
       <SubType>UserControl</SubType>
     </Compile>
   </ItemGroup>

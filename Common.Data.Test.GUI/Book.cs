@@ -12,11 +12,13 @@ namespace Common.Data.Test.GUI {
         #region Properties
 
         [SubSonicNullString]
+        [DbRecordSelector.Column(10, "Name", 150)]
         public string Name { get; set; }
 
         [Configuration("ConfigTest for Book", 10,
             ControlType = ConfigurationEntry.ControlTypes.TextBox)]
         [SubSonicNullString]
+        [DbRecordSelector.Column(20, "Just a test", 250)]
         public string ConfigTest { get; set; }
 
         #endregion
