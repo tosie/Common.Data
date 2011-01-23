@@ -108,7 +108,7 @@ namespace Common.Data {
         /// <param name="RecordType">The type of the DbRecord subclass to show the form for.</param>
         /// <param name="SelectedRecord">Record to be selected when showing the form for the first time.</param>
         public static IEditableDbRecord SelectRecord(IWin32Window Owner, String Name, String Title,
-                Type RecordType, List<IEditableDbRecord> Records, IEditableDbRecord SelectedRecord = null) {
+                Type RecordType, List<IEditableDbRecord> Records, IEditableDbRecord SelectedRecord) {
 
             using (var form = new DbRecordSelectorForm()) {
                 form.InitializeForm(Owner, Name, Title, RecordType, Records, SelectedRecord);

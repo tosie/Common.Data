@@ -54,9 +54,10 @@ namespace Common.Data.Test.GUI {
             var record = DbRecordSelectorForm.SelectRecord(
                 this,
                 "RecordSelector",
-                "Buch auswählen",
+                "Select a book",
                 typeof(Book),
-                ListExtensions.ConvertTo<Book, IEditableDbRecord>(Book.Read()));
+                ListExtensions.ConvertTo<Book, IEditableDbRecord>(Book.Read()),
+                null);
 
             if (record == null)
                 MessageBox.Show("Nothing selected.");
