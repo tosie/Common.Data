@@ -124,7 +124,11 @@ namespace Common.Data {
             return GetCache<T>(repository).Find(i => i.Id == Id) != null;
         }
 
-        protected void AddToDatabase<T>(SimpleRepository repository, bool initializeDefaults = false, Object tag = null) where T : DbRecord, IDbRecord, new()  {
+        protected void AddToDatabase<T>(SimpleRepository repository) where T : DbRecord, IDbRecord, new() {
+            AddToDatabase<T>(repository, false, null);
+        }
+
+        protected void AddToDatabase<T>(SimpleRepository repository, bool initializeDefaults, Object tag) where T : DbRecord, IDbRecord, new()  {
             IsDeleted = false;
             OwningRepository = repository;
 
